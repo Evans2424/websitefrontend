@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import NavBar from '@/app/components/NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider } from './context/auth-context'
 
 export const metadata: Metadata = {
   title: 'TEUP - Tuna de Engenharia da Universidade do Porto',
@@ -37,8 +38,10 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <NavBar />
-          {children}
+          <AuthProvider>
+            <NavBar />
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

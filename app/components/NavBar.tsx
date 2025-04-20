@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import LoginUI from './LoginUI'
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -63,24 +64,35 @@ export default function NavBar() {
           </Link>
         </motion.div>
 
-        <div className="hidden md:flex space-x-8">
-          {navLinks.map((item, index) => (
-            <motion.div
-              key={item.name}
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 * index }}
-            >
-              <Link
-                href={item.path}
-                className="hover:text-red-500 transition-all duration-300 relative group font-inter font-medium text-white"
-                onClick={(e) => scrollToSection(e, item.path)}
+        <div className="hidden md:flex items-center">
+          <div className="flex space-x-8 mr-6">
+            {navLinks.map((item, index) => (
+              <motion.div
+                key={item.name}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 * index }}
               >
-                {item.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-500 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </motion.div>
-          ))}
+                <Link
+                  href={item.path}
+                  className="hover:text-red-500 transition-all duration-300 relative group font-inter font-medium text-white"
+                  onClick={(e) => scrollToSection(e, item.path)}
+                >
+                  {item.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-500 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+          
+          {/* Add LoginUI component */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 * navLinks.length }}
+          >
+            <LoginUI />
+          </motion.div>
         </div>
 
         <motion.button
@@ -128,6 +140,16 @@ export default function NavBar() {
                 </Link>
               </motion.div>
             ))}
+            
+            {/* Add LoginUI to mobile menu */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 * navLinks.length }}
+              className="mt-4"
+            >
+              <LoginUI />
+            </motion.div>
           </div>
         </motion.div>
       )}
