@@ -59,7 +59,7 @@ export default function NavBar() {
             className="text-2xl font-bold tracking-tighter flex items-center"
           >
             <img src="/images/teup-logo.png" alt="TEUP Logo" className="h-10 w-10 mr-3" />
-            <span className="font-['Cinzel',serif] bg-gradient-to-r from-white to-red-400 bg-clip-text text-transparent">TEUP</span>
+            <span className="font-medium text-white">TEUP</span>
           </Link>
         </motion.div>
 
@@ -73,7 +73,7 @@ export default function NavBar() {
             >
               <Link
                 href={item.path}
-                className="hover:text-red-500 transition-all duration-300 relative group font-['Montserrat',sans-serif] font-medium text-white"
+                className="hover:text-red-500 transition-all duration-300 relative group font-inter font-medium text-white"
                 onClick={(e) => scrollToSection(e, item.path)}
               >
                 {item.name}
@@ -121,7 +121,7 @@ export default function NavBar() {
               >
                 <Link
                   href={item.path}
-                  className="text-2xl hover:text-red-500 transition-all duration-300 font-['Montserrat',sans-serif] text-white"
+                  className="text-2xl hover:text-red-500 transition-all duration-300 font-inter text-white"
                   onClick={(e) => scrollToSection(e, item.path)}
                 >
                   {item.name}

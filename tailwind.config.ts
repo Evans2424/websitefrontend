@@ -16,6 +16,9 @@ const config: Config = {
         'cinzel': ['Cinzel', 'serif'],
         'montserrat': ['Montserrat', 'sans-serif'],
         'playfair': ['Playfair Display', 'serif'],
+        'inter': ['Inter', 'sans-serif'],
+        'outfit': ['Outfit', 'sans-serif'],
+        'dm-sans': ['DM Sans', 'sans-serif'],
       },
       // Shadows from tailwind.config.mjs
       boxShadow: {

@@ -470,16 +470,16 @@ export default function LandingPage() {
       >
         <div className="container mx-auto px-4">
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+            className="grid grid-cols-1 md:grid-cols-4 gap-4"
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
           >
             {[
               { icon: <FaNewspaper className="text-4xl mb-2" />, text: "Notícias", target: "news" },
-              { icon: <FaMusic className="text-4xl mb-2" />, text: "Música", target: "discography" },
+              { icon: <FaMusic className="text-4xl mb-2" />, text: "Membros", target: "members" },
               { icon: <FaCalendarAlt className="text-4xl mb-2" />, text: "Agenda", target: "performances" },
-              { icon: <FaShoppingCart className="text-4xl mb-2" />, text: "Loja", target: "https://example.com/loja" },
+              { icon: <FaMusic className="text-4xl mb-2" />, text: "Discografia", target: "discography" },
             ].map((item, index) => (
               <motion.a
                 key={index}
@@ -778,16 +778,17 @@ export default function LandingPage() {
               variants={staggerItem}
             >
               <div className="w-full max-w-md">
-                <div className="aspect-square w-full mb-5 shadow-xl hover:shadow-red-500/20 transition-all duration-500 rounded-xl overflow-hidden">
+                <div className="aspect-square w-full mb-5 shadow-xl hover:shadow-red-500/20 transition-all duration-500 rounded-xl overflow-hidden bg-[#121212]">
                   <iframe
-                    src="https://open.spotify.com/embed/album/3FaNaNyy7dhM8Kk9MmCq5e?utm_source=generator&theme=0"
+                    src="https://open.spotify.com/embed/album/3FaNaNyy7dhM8Kk9MmCq5e"
                     width="100%"
                     height="100%"
                     frameBorder="0"
                     allowFullScreen
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
-                    style={{ borderRadius: "12px" }}
+                    className="rounded-xl"
+                    title="Spotify embed: Com o porto da memória"
                   ></iframe>
                 </div>
                 <h3 className="text-xl font-bold text-center mb-1 font-['Playfair_Display',serif]">Com o porto da memória</h3>
@@ -814,16 +815,17 @@ export default function LandingPage() {
               variants={staggerItem}
             >
               <div className="w-full max-w-md">
-                <div className="aspect-square w-full mb-5 shadow-xl hover:shadow-red-500/20 transition-all duration-500 rounded-xl overflow-hidden">
+                <div className="aspect-square w-full mb-5 shadow-xl hover:shadow-red-500/20 transition-all duration-500 rounded-xl overflow-hidden bg-[#121212]">
                   <iframe
-                    src="https://open.spotify.com/embed/album/6DFtJko0k0BBDe8kFKdRLc?utm_source=generator&theme=0"
+                    src="https://open.spotify.com/embed/album/6DFtJko0k0BBDe8kFKdRLc"
                     width="100%"
                     height="100%"
                     frameBorder="0"
                     allowFullScreen
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
-                    style={{ borderRadius: "12px" }}
+                    className="rounded-xl"
+                    title="Spotify embed: Para lá dos palcos"
                   ></iframe>
                 </div>
                 <h3 className="text-xl font-bold text-center mb-1 font-['Playfair_Display',serif]">Para lá dos palcos</h3>
