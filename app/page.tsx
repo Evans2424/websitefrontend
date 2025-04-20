@@ -780,10 +780,21 @@ export default function LandingPage() {
             <motion.div
               className="flex flex-col items-center"
               variants={staggerItem}
+              whileHover={{ 
+                scale: 1.03, 
+                transition: { duration: 0.5, ease: "easeOut" } 
+              }}
             >
               <div className="w-full max-w-md">
-                <div className="aspect-square w-full mb-5 shadow-xl hover:shadow-red-500/20 transition-all duration-500 rounded-xl overflow-hidden bg-[#121212]">
-                  <iframe
+                <motion.div 
+                  className="aspect-square w-full mb-5 shadow-xl hover:shadow-red-500/20 transition-all duration-500 rounded-xl overflow-hidden bg-[#121212]"
+                  initial={{ boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
+                  whileHover={{ 
+                    boxShadow: "0 20px 25px -5px rgba(220,38,38,0.25)", 
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <motion.iframe
                     src="https://open.spotify.com/embed/album/3FaNaNyy7dhM8Kk9MmCq5e"
                     width="100%"
                     height="100%"
@@ -793,23 +804,55 @@ export default function LandingPage() {
                     loading="lazy"
                     className="rounded-xl"
                     title="Spotify embed: Com o porto da memória"
-                  ></iframe>
-                </div>
-                <h3 className="text-xl font-bold text-center mb-1 font-['Playfair_Display',serif]">Com o porto da memória</h3>
-                <p className="text-red-500 text-sm text-center mb-4 font-['Montserrat',sans-serif]">2017</p>
-                <div className="flex justify-center">
-                  <a
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: { delay: 0.3, duration: 0.8 } }}
+                  ></motion.iframe>
+                </motion.div>
+                <motion.h3 
+                  className="text-xl font-bold text-center mb-1 font-['Playfair_Display',serif]"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  Com o porto da memória
+                </motion.h3>
+                <motion.p 
+                  className="text-red-500 text-sm text-center mb-4 font-['Montserrat',sans-serif]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                  2017
+                </motion.p>
+                <motion.div 
+                  className="flex justify-center"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                >
+                  <motion.a
                     href="https://open.spotify.com/album/3FaNaNyy7dhM8Kk9MmCq5e?si=36171f4b5b634613"
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="px-6 py-2 bg-[#1DB954] hover:bg-[#1ed760] text-black rounded-full font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-['Montserrat',sans-serif] flex items-center"
+                    whileHover={{ scale: 1.08, boxShadow: "0 10px 15px -3px rgba(29,185,84,0.4)" }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 mr-2">
+                    <motion.svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      viewBox="0 0 24 24" 
+                      fill="currentColor" 
+                      className="w-5 h-5 mr-2"
+                      animate={{ 
+                        rotate: [0, 10, -10, 10, 0],
+                        transition: { duration: 2, repeat: Infinity, repeatDelay: 3 }
+                      }}
+                    >
                       <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.059 14.406c-.183.307-.564.4-.87.217-2.383-1.455-5.381-1.783-8.916-.973-.34.08-.684-.136-.764-.476-.08-.341.136-.684.476-.765 3.868-.876 7.167-.5 9.856 1.127.308.183.4.564.218.87zm1.085-2.415c-.229.379-.72.5-1.1.27-2.73-1.678-6.894-2.165-10.122-1.183-.414.125-.854-.106-.98-.52-.123-.413.108-.852.52-.978 3.694-1.122 8.282-.573 11.412 1.312.38.23.5.72.27 1.1zm.094-2.514c-3.273-1.944-8.67-2.124-11.8-1.175-.496.15-1.02-.13-1.17-.624-.148-.495.13-1.02.625-1.167 3.57-1.082 9.502-.874 13.246 1.358.453.27.6.864.33 1.317-.272.452-.864.6-1.318.33l.087-.04z"/>
-                    </svg>
+                    </motion.svg>
                     Ouvir no Spotify
-                  </a>
-                </div>
+                  </motion.a>
+                </motion.div>
               </div>
             </motion.div>
 
@@ -817,10 +860,21 @@ export default function LandingPage() {
             <motion.div
               className="flex flex-col items-center"
               variants={staggerItem}
+              whileHover={{ 
+                scale: 1.03, 
+                transition: { duration: 0.5, ease: "easeOut" } 
+              }}
             >
               <div className="w-full max-w-md">
-                <div className="aspect-square w-full mb-5 shadow-xl hover:shadow-red-500/20 transition-all duration-500 rounded-xl overflow-hidden bg-[#121212]">
-                  <iframe
+                <motion.div 
+                  className="aspect-square w-full mb-5 shadow-xl hover:shadow-red-500/20 transition-all duration-500 rounded-xl overflow-hidden bg-[#121212]"
+                  initial={{ boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
+                  whileHover={{ 
+                    boxShadow: "0 20px 25px -5px rgba(220,38,38,0.25)", 
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <motion.iframe
                     src="https://open.spotify.com/embed/album/6DFtJko0k0BBDe8kFKdRLc"
                     width="100%"
                     height="100%"
@@ -830,23 +884,55 @@ export default function LandingPage() {
                     loading="lazy"
                     className="rounded-xl"
                     title="Spotify embed: Para lá dos palcos"
-                  ></iframe>
-                </div>
-                <h3 className="text-xl font-bold text-center mb-1 font-['Playfair_Display',serif]">Para lá dos palcos</h3>
-                <p className="text-red-500 text-sm text-center mb-4 font-['Montserrat',sans-serif]">2007</p>
-                <div className="flex justify-center">
-                  <a
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: { delay: 0.5, duration: 0.8 } }}
+                  ></motion.iframe>
+                </motion.div>
+                <motion.h3 
+                  className="text-xl font-bold text-center mb-1 font-['Playfair_Display',serif]"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                >
+                  Para lá dos palcos
+                </motion.h3>
+                <motion.p 
+                  className="text-red-500 text-sm text-center mb-4 font-['Montserrat',sans-serif]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.7 }}
+                >
+                  2007
+                </motion.p>
+                <motion.div 
+                  className="flex justify-center"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.8 }}
+                >
+                  <motion.a
                     href="https://open.spotify.com/album/6DFtJko0k0BBDe8kFKdRLc?si=dxHO7gsmSruolOHHcoHE3Q"
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="px-6 py-2 bg-[#1DB954] hover:bg-[#1ed760] text-black rounded-full font-medium transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-['Montserrat',sans-serif] flex items-center"
+                    whileHover={{ scale: 1.08, boxShadow: "0 10px 15px -3px rgba(29,185,84,0.4)" }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 mr-2">
+                    <motion.svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      viewBox="0 0 24 24" 
+                      fill="currentColor" 
+                      className="w-5 h-5 mr-2"
+                      animate={{ 
+                        rotate: [0, 10, -10, 10, 0],
+                        transition: { duration: 2, repeat: Infinity, repeatDelay: 3.5 }
+                      }}
+                    >
                       <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.059 14.406c-.183.307-.564.4-.87.217-2.383-1.455-5.381-1.783-8.916-.973-.34.08-.684-.136-.764-.476-.08-.341.136-.684.476-.765 3.868-.876 7.167-.5 9.856 1.127.308.183.4.564.218.87zm1.085-2.415c-.229.379-.72.5-1.1.27-2.73-1.678-6.894-2.165-10.122-1.183-.414.125-.854-.106-.98-.52-.123-.413.108-.852.52-.978 3.694-1.122 8.282-.573 11.412 1.312.38.23.5.72.27 1.1zm.094-2.514c-3.273-1.944-8.67-2.124-11.8-1.175-.496.15-1.02-.13-1.17-.624-.148-.495.13-1.02.625-1.167 3.57-1.082 9.502-.874 13.246 1.358.453.27.6.864.33 1.317-.272.452-.864.6-1.318.33l.087-.04z"/>
-                    </svg>
+                    </motion.svg>
                     Ouvir no Spotify
-                  </a>
-                </div>
+                  </motion.a>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>
