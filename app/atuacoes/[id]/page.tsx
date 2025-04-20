@@ -1,15 +1,6 @@
+"use client"
+
 import { useParams } from "next/navigation"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import {
-  FaArrowLeft,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaShareAlt,
-  FaFacebook,
-  FaTwitter,
-  FaWhatsapp,
-} from "react-icons/fa"
 import PerformanceDetailClient from "./PerformanceDetailClient"
 import PerformanceNotFound from "./PerformanceNotFound"
 
@@ -63,16 +54,10 @@ const performances = [
   },
 ]
 
-// Generate static params for all performances
-export async function generateStaticParams() {
-  return performances.map((performance) => ({
-    id: String(performance.id)
-  }))
-}
-
-// Find the performance with the matching id
-export default async function PerformanceDetail({ params }: { params: { id: string } }) {
-  // Convert params.id to number after ensuring it's resolved
+export default function PerformanceDetail() {
+  // Use useParams hook to get the id parameter from the URL
+  const params = useParams();
+  // Convert id to number
   const id = Number(params.id)
   
   // Find the matching performance

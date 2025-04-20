@@ -96,16 +96,6 @@ export default function AllNews() {
 
   return (
     <div className="min-h-screen bg-black text-white font-['Playfair_Display',serif]">
-      {/* Navigation */}
-      <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center">
-            <img src="/images/teup-logo.png" alt="TEUP Logo" className="h-10 w-10 mr-3" />
-            <span className="font-['Cinzel',serif]">TEUP</span>
-          </Link>
-        </div>
-      </nav>
-
       {/* Hero Section */}
       <section className="pt-28 pb-12">
         <div className="container mx-auto px-4">

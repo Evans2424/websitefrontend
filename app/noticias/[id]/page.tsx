@@ -1,7 +1,6 @@
+"use client"
+
 import { useParams } from "next/navigation"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { FaArrowLeft, FaCalendarAlt, FaShareAlt, FaFacebook, FaTwitter, FaWhatsapp } from "react-icons/fa"
 import NewsDetailClient from "./NewsDetailClient"
 import NewsNotFound from "./NewsNotFound"
 
@@ -45,17 +44,11 @@ const newsItems = [
   },
 ]
 
-// Generate static params for all news items
-export async function generateStaticParams() {
-  return newsItems.map((newsItem) => ({
-    id: String(newsItem.id)
-  }))
-}
-
-// Find the news item with the matching id
-export default async function NewsDetail({ params }: { params: { id: string } }) {
-  // Convert params.id to number after ensuring it's resolved
-  const id = Number(params.id)
+export default function NewsDetail() {
+  // Use useParams hook to get the id parameter from the URL
+  const params = useParams();
+  // Convert id to number
+  const id = Number(params.id);
   
   // Find the matching news item
   const newsItem = newsItems.find((item) => item.id === id)

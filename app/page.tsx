@@ -309,7 +309,6 @@ function useIntersectionObserver(options = {}): [React.RefObject<HTMLElement>, b
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<"current" | "former">("current")
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeGalleryFilter, setActiveGalleryFilter] = useState("all")
 
   // Gallery images with categories
@@ -376,99 +375,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-black text-white font-['Playfair_Display',serif] overflow-x-hidden w-full">
-      {/* Navigation */}
-      <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <motion.a
-            href="#"
-            className="text-2xl font-bold tracking-tighter flex items-center"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <img src="/images/teup-logo.png" alt="TEUP Logo" className="h-10 w-10 mr-3" />
-            <span className="font-['Cinzel',serif]">TEUP</span>
-          </motion.a>
-
-          <div className="hidden md:flex space-x-8">
-            {["Sobre", "Tunos", "Notícias", "Discografia", "Atuações", "Galeria", "Contacto"].map((item, index) => (
-              <motion.a
-                key={item}
-                href={`#${["about", "members", "news", "discography", "performances", "gallery", "contact"][index]}`}
-                className="hover:text-red-500 transition-all duration-300 relative group font-['Montserrat',sans-serif] font-medium"
-                onClick={(e) => {
-                  e.preventDefault()
-                  document
-                    .getElementById(
-                      ["about", "members", "news", "discography", "performances", "gallery", "contact"][index],
-                    )
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
-              >
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-500 transition-all duration-300 group-hover:w-full"></span>
-              </motion.a>
-            ))}
-          </div>
-
-          <motion.button
-            className="md:hidden z-50"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className={`h-6 w-6 transition-all duration-300 ${isMenuOpen ? "rotate-90" : "rotate-0"}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </motion.button>
-        </div>
-
-        {/* Mobile menu */}
-        {isMenuOpen && (
-          <motion.div
-            className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-40 md:hidden"
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex flex-col items-center space-y-6">
-              {["Sobre", "Tunos", "Notícias", "Discografia", "Atuações", "Galeria", "Contacto"].map((item, index) => (
-                <motion.a
-                  key={item}
-                  href={`#${["about", "members", "news", "discography", "performances", "gallery", "contact"][index]}`}
-                  className="text-2xl hover:text-red-500 transition-all duration-300 font-['Montserrat',sans-serif]"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    document
-                      .getElementById(
-                        ["about", "members", "news", "discography", "performances", "gallery", "contact"][index],
-                      )
-                      ?.scrollIntoView({ behavior: "smooth" })
-                    setIsMenuOpen(false)
-                  }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: 0.1 * index }}
-                >
-                  {item}
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </nav>
-
       {/* Hero Section with Carousel */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0 h-full w-full">
@@ -877,6 +783,8 @@ export default function LandingPage() {
                     src="https://open.spotify.com/embed/album/3FaNaNyy7dhM8Kk9MmCq5e?utm_source=generator&theme=0"
                     width="100%"
                     height="100%"
+                    frameBorder="0"
+                    allowFullScreen
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
                     style={{ borderRadius: "12px" }}
@@ -911,6 +819,8 @@ export default function LandingPage() {
                     src="https://open.spotify.com/embed/album/6DFtJko0k0BBDe8kFKdRLc?utm_source=generator&theme=0"
                     width="100%"
                     height="100%"
+                    frameBorder="0"
+                    allowFullScreen
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
                     style={{ borderRadius: "12px" }}
