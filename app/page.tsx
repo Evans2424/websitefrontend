@@ -7,157 +7,7 @@ import ImageCarousel from "./components/ImageCarousel"
 import { motion } from "framer-motion"
 import ScrollToTop from "./components/ScrollToTop"
 import FlippableCard from "./components/FlippableCard"
-
-// Member data types
-type MemberRole =
-  | "Violão"
-  | "Bandolim"
-  | "Viola"
-  | "Cavaquinho"
-  | "Acordeão"
-  | "Flauta"
-  | "Percussão"
-  | "Contrabaixo"
-  | "Pandeireta"
-  | "Voz"
-
-interface Member {
-  id: number
-  name: string
-  nickname?: string
-  role: MemberRole
-  joinYear: number
-  course?: string
-  bio: string
-  image: string
-  isLeader?: boolean
-}
-
-// Sample data for current members
-const currentMembers: Member[] = [
-  {
-    id: 1,
-    name: "João Silva",
-    nickname: "Maestro",
-    role: "Violão",
-    joinYear: 2018,
-    course: "Engenharia Informática",
-    bio: "João é o atual Ensaiador da TEUP. Entrou para a Tuna em 2018 e desde então tem sido uma peça fundamental no grupo. Especialista em violão clássico, tem mais de 10 anos de experiência musical.",
-    image: "/placeholder.svg?height=300&width=300",
-    isLeader: true,
-  },
-  {
-    id: 2,
-    name: "Miguel Costa",
-    nickname: "Tenor",
-    role: "Voz",
-    joinYear: 2019,
-    course: "Engenharia Mecânica",
-    bio: "Miguel é o nosso vocalista principal com uma poderosa voz de tenor. Canta desde criança e entrou para a TEUP no seu segundo ano de faculdade.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: 3,
-    name: "António Ferreira",
-    nickname: "Bandolas",
-    role: "Bandolim",
-    joinYear: 2020,
-    course: "Engenharia Civil",
-    bio: "António é um dos nossos talentosos bandolinistas. Traz energia e precisão a cada atuação da TEUP.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: 4,
-    name: "Francisco Oliveira",
-    nickname: "Presidente",
-    role: "Viola",
-    joinYear: 2017,
-    course: "Engenharia Eletrotécnica",
-    bio: "Francisco é o nosso membro mais experiente e serve como Presidente da TEUP. A sua liderança tem guiado a Tuna através de muitas atuações bem-sucedidas.",
-    image: "/placeholder.svg?height=300&width=300",
-    isLeader: true,
-  },
-  {
-    id: 5,
-    name: "Pedro Santos",
-    nickname: "Cavaco",
-    role: "Cavaquinho",
-    joinYear: 2019,
-    course: "Engenharia Química",
-    bio: "Pedro traz o som tradicional do cavaquinho às nossas atuações. Os seus dedos ágeis e conhecimento musical são inestimáveis para o grupo.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: 6,
-    name: "Diogo Martins",
-    nickname: "Acordes",
-    role: "Acordeão",
-    joinYear: 2021,
-    course: "Engenharia Ambiental",
-    bio: "O nosso membro mais recente, Diogo, rapidamente se tornou essencial com as suas habilidades no acordeão que adicionam profundidade ao nosso som tradicional.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: 7,
-    name: "Tiago Almeida",
-    nickname: "Ritmo",
-    role: "Percussão",
-    joinYear: 2018,
-    course: "Engenharia de Materiais",
-    bio: "Tiago mantém o ritmo com as suas habilidades de percussão. Também é responsável por organizar muitas das nossas atuações.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: 8,
-    name: "Rui Sousa",
-    nickname: "Baixo",
-    role: "Contrabaixo",
-    joinYear: 2020,
-    course: "Engenharia Física",
-    bio: "Rui fornece a base do nosso som com o seu contrabaixo. O seu conhecimento de teoria musical ajuda a arranjar as nossas peças tradicionais.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-]
-
-// Sample data for former members
-const formerMembers: Member[] = [
-  {
-    id: 101,
-    name: "Manuel Rodrigues",
-    nickname: "Fundador",
-    role: "Violão",
-    joinYear: 2000,
-    bio: "Manuel esteve na TEUP durante 8 anos e foi fundamental no estabelecimento do nosso repertório atual. Agora trabalha como professor de música.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: 102,
-    name: "José Pereira",
-    nickname: "Voz de Ouro",
-    role: "Voz",
-    joinYear: 2005,
-    bio: "A poderosa voz de José liderou muitas das nossas atuações até à sua formatura em 2010. Ainda se junta a nós para eventos especiais de antigos alunos.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: 103,
-    name: "Carlos Nunes",
-    nickname: "Virtuoso",
-    role: "Bandolim",
-    joinYear: 2008,
-    bio: "Carlos era conhecido pelas suas técnicas inovadoras de bandolim que trouxeram um som único à TEUP de 2008 a 2012.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: 104,
-    name: "André Lopes",
-    nickname: "Flautista",
-    role: "Flauta",
-    joinYear: 2010,
-    bio: "A flauta de André adicionou uma camada melódica às nossas atuações durante 5 anos. Agora atua com um conjunto folclórico profissional.",
-    image: "/placeholder.svg?height=300&width=300",
-  },
-]
+import { Member, fetchHomepageMembers } from "@/lib/members-service"
 
 // News/Events data
 interface NewsItem {
@@ -283,15 +133,25 @@ const staggerItem = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
 }
 
-// Custom hook for intersection observer
+// Custom hook for intersection observer with options for improved performance
 function useIntersectionObserver(options = {}): [React.RefObject<HTMLElement>, boolean] {
   const elementRef = useRef<HTMLElement>(null)
   const [isIntersecting, setIsIntersecting] = useState(false)
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting)
-    }, options)
+      // Only update state if visibility actually changed
+      setIsIntersecting(prev => {
+        if (prev !== entry.isIntersecting) {
+          return entry.isIntersecting;
+        }
+        return prev;
+      });
+    }, {
+      rootMargin: '100px', // Load content a bit before it comes into view
+      threshold: 0.1,      // Trigger earlier at 10% visibility
+      ...options
+    })
 
     if (elementRef.current) {
       observer.observe(elementRef.current)
@@ -308,8 +168,52 @@ function useIntersectionObserver(options = {}): [React.RefObject<HTMLElement>, b
 }
 
 export default function LandingPage() {
-  const [activeTab, setActiveTab] = useState<"current" | "former">("current")
-  const [activeGalleryFilter, setActiveGalleryFilter] = useState("all")
+  const [activeMembers, setActiveMembers] = useState<Member[]>([]);
+  const [formerMembers, setFormerMembers] = useState<Member[]>([]);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(true);
+  const [activeTab, setActiveTab] = useState<"current" | "former">("current");
+  const [activeGalleryFilter, setActiveGalleryFilter] = useState("all");
+
+  // Fetch homepage members
+  useEffect(() => {
+    const loadMembers = async () => {
+      setIsLoadingMembers(true);
+      try {
+        const { activeMembers, formerMembers } = await fetchHomepageMembers();
+        setActiveMembers(activeMembers);
+        setFormerMembers(formerMembers);
+      } catch (error) {
+        console.error("Error loading members:", error);
+      } finally {
+        setIsLoadingMembers(false);
+      }
+    };
+
+    loadMembers();
+  }, []);
+
+  // Function to get priority and random members for display
+  const getMembersToDisplay = (members: Member[]) => {
+    // Filter out members with special roles (they always appear)
+    const specialRoleMembers = members.filter(
+      (member) => member.specialRole === 'Magister' || member.specialRole === 'Ensaiador' || member.specialRole === 'Diretor Artístico'
+    );
+
+    // Get regular members (Tuno and Mestre-Tuno only)
+    const regularMembers = members.filter(
+      (member) => 
+        !specialRoleMembers.includes(member) && 
+        (member.hierarchy === 'Tuno' || member.hierarchy === 'Mestre-Tuno')
+    );
+
+    // Shuffle and pick 8 - or fewer if not enough
+    const shuffledMembers = [...regularMembers].sort(() => 0.5 - Math.random());
+    const displayCount = Math.min(8 - specialRoleMembers.length, regularMembers.length);
+    const randomMembers = shuffledMembers.slice(0, displayCount);
+
+    // Combine with special role members and return
+    return [...specialRoleMembers, ...randomMembers];
+  }
 
   // Gallery images with categories
   const galleryImages = [
@@ -670,81 +574,98 @@ export default function LandingPage() {
                 Antigos Membros
               </button>
             </div>
+            <div className="mt-4">
+              <Link 
+                href="/membros"
+                className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif] mx-auto w-max"
+              >
+                Ver todos os membros{" "}
+                <span className="ml-2 transform transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </Link>
+            </div>
           </motion.div>
 
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-            variants={staggerContainer}
-            initial="hidden"
-            animate={membersVisible ? "visible" : "hidden"}
-          >
-            {(activeTab === "current" ? currentMembers : formerMembers).map((member) => (
-              <motion.div
-                key={member.id}
-                className="h-[420px]"
-                variants={staggerItem}
-              >
-                <FlippableCard 
-                  frontContent={
-                    <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:shadow-red-500/10">
-                      <div className="overflow-hidden h-64">
-                        <img
-                          src={member.image || "/placeholder.svg"}
-                          alt={member.name}
-                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                        />
+          {isLoadingMembers ? (
+            <div className="text-center py-20">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-red-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                <span className="sr-only">Carregando...</span>
+              </div>
+              <p className="mt-4 text-gray-400">Carregando membros...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {/* Get selected members to display using our function */}
+              {(activeTab === "current" ? activeMembers : formerMembers).map((member) => (
+                <div key={member.id} className="h-[420px]">
+                  <FlippableCard 
+                    frontContent={
+                      <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:shadow-red-500/10">
+                        <div className="overflow-hidden h-64">
+                          <img
+                            src={member.image || "/placeholder.svg"}
+                            alt={member.name}
+                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                          />
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-xl font-bold mb-1 font-['Playfair_Display',serif]">{member.name}</h3>
+                          {member.nickname && (
+                            <p className="text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">"{member.nickname}"</p>
+                          )}
+                          <p className="text-gray-400 mb-2 font-['Montserrat',sans-serif]">{member.role}</p>
+                          {/* Display special role tags */}
+                          {member.specialRole && (
+                            <span className="inline-block bg-red-700/20 text-red-400 text-xs px-2 py-1 rounded-full mb-2 font-['Montserrat',sans-serif]">
+                              {member.specialRole}
+                            </span>
+                          )}
+                          <p className="text-gray-500 text-sm font-['Montserrat',sans-serif]">Desde {member.joinYear}</p>
+                        </div>
                       </div>
-                      <div className="p-6">
-                        <h3 className="text-xl font-bold mb-1 font-['Playfair_Display',serif]">{member.name}</h3>
+                    }
+                    backContent={
+                      <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
+                        <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{member.name}</h3>
                         {member.nickname && (
-                          <p className="text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">"{member.nickname}"</p>
+                          <p className="text-red-500 text-lg mb-2 font-['Montserrat',sans-serif]">
+                            "{member.nickname}"
+                          </p>
                         )}
-                        <p className="text-gray-400 mb-2 font-['Montserrat',sans-serif]">{member.role}</p>
-                        {member.isLeader && (
-                          <span className="inline-block bg-red-700/20 text-red-400 text-xs px-2 py-1 rounded-full mb-2 font-['Montserrat',sans-serif]">
-                            Direção
-                          </span>
-                        )}
-                        <p className="text-gray-500 text-sm font-['Montserrat',sans-serif]">Desde {member.joinYear}</p>
-                      </div>
-                    </div>
-                  }
-                  backContent={
-                    <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
-                      <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{member.name}</h3>
-                      {member.nickname && (
-                        <p className="text-red-500 text-lg mb-2 font-['Montserrat',sans-serif]">
-                          "{member.nickname}"
-                        </p>
-                      )}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        <div className="bg-gray-800 px-3 py-1 rounded-lg">
-                          <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Instrumento</p>
-                          <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.role}</p>
-                        </div>
-                        <div className="bg-gray-800 px-3 py-1 rounded-lg">
-                          <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Desde</p>
-                          <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.joinYear}</p>
-                        </div>
-                        {member.course && (
-                          <div className="bg-gray-800 px-3 py-1 rounded-lg">
-                            <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Curso</p>
-                            <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.course}</p>
+                        {/* Add special role display */}
+                        {member.specialRole && (
+                          <div className="bg-red-700/20 mb-3 px-3 py-2 rounded-lg inline-block">
+                            <p className="text-red-400 font-semibold font-['Montserrat',sans-serif]">{member.specialRole}</p>
                           </div>
                         )}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          <div className="bg-gray-800 px-3 py-1 rounded-lg">
+                            <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Instrumento</p>
+                            <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.role}</p>
+                          </div>
+                          <div className="bg-gray-800 px-3 py-1 rounded-lg">
+                            <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Desde</p>
+                            <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.joinYear}</p>
+                          </div>
+                          {member.course && (
+                            <div className="bg-gray-800 px-3 py-1 rounded-lg">
+                              <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Curso</p>
+                              <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.course}</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="prose prose-sm prose-invert max-w-none font-['Montserrat',sans-serif] flex-grow overflow-y-auto">
+                          <p className="text-gray-300 text-sm">{member.bio}</p>
+                        </div>
+                        <div className="mt-4 text-center">
+                          <span className="text-xs text-gray-500 font-['Montserrat',sans-serif]">Clique para voltar</span>
+                        </div>
                       </div>
-                      <div className="prose prose-sm prose-invert max-w-none font-['Montserrat',sans-serif] flex-grow overflow-y-auto">
-                        <p className="text-gray-300 text-sm">{member.bio}</p>
-                      </div>
-                      <div className="mt-4 text-center">
-                        <span className="text-xs text-gray-500 font-['Montserrat',sans-serif]">Clique para voltar</span>
-                      </div>
-                    </div>
-                  }
-                />
-              </motion.div>
-            ))}
-          </motion.div>
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
