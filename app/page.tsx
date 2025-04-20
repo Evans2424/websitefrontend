@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { FaShoppingCart, FaCalendarAlt, FaMusic, FaNewspaper } from "react-icons/fa"
 import Link from "next/link"
 import ImageCarousel from "./components/ImageCarousel"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import ScrollToTop from "./components/ScrollToTop"
 import FlippableCard from "./components/FlippableCard"
 import { Member, fetchHomepageMembers } from "@/lib/members-service"
@@ -339,13 +339,13 @@ export default function LandingPage() {
           <ImageCarousel images={carouselImages} className="h-full" />
         </div>
         <motion.div
-          className="container mx-auto px-4 z-10 text-center"
+          className="container mx-auto px-4 z-10 text-center relative pointer-events-none"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
           <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-4 tracking-tight font-['Cinzel',serif] text-shadow-lg"
+            className="text-5xl md:text-7xl font-bold mb-4 tracking-tight font-['Cinzel',serif] text-shadow-lg pointer-events-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.7 }}
@@ -353,7 +353,7 @@ export default function LandingPage() {
             TUNA DE ENGENHARIA
           </motion.h1>
           <motion.h2
-            className="text-3xl md:text-4xl font-semibold mb-6 text-red-500 font-['Cinzel',serif] text-shadow-lg"
+            className="text-3xl md:text-4xl font-semibold mb-6 text-red-500 font-['Cinzel',serif] text-shadow-lg pointer-events-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
@@ -361,7 +361,7 @@ export default function LandingPage() {
             UNIVERSIDADE DO PORTO
           </motion.h2>
           <motion.p
-            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-white font-['Montserrat',sans-serif] text-shadow-lg"
+            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto text-white font-['Montserrat',sans-serif] text-shadow-lg pointer-events-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.1 }}
@@ -369,7 +369,7 @@ export default function LandingPage() {
             Tradição, música e engenharia desde 1988
           </motion.p>
           <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center pointer-events-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.3 }}
@@ -399,7 +399,7 @@ export default function LandingPage() {
 
         {/* Animated scroll indicator */}
         <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10 pointer-events-none"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.5, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }}
@@ -551,15 +551,14 @@ export default function LandingPage() {
 
           <motion.div
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="hidden"
-            animate={newsVisible ? "visible" : "hidden"}
+            initial={{ opacity: 0 }}
+            animate={newsVisible ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
             {newsItems.map((item) => (
-              <motion.div
+              <div
                 key={item.id}
                 className="bg-gray-900 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
-                variants={staggerItem}
               >
                 {item.image && (
                   <div className="overflow-hidden">
@@ -584,7 +583,7 @@ export default function LandingPage() {
                     </span>
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </motion.div>
         </div>
@@ -597,7 +596,7 @@ export default function LandingPage() {
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={membersVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.6 }}
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Cinzel',serif] relative inline-block">
               Nossos Tunos
@@ -607,35 +606,44 @@ export default function LandingPage() {
               Conheça os membros que fazem a TEUP acontecer, trazendo música e tradição para cada apresentação.
             </p>
             <div className="flex justify-center mt-6 space-x-4">
-              <button
+              <motion.button
                 onClick={() => setActiveTab("current")}
                 className={`px-4 py-2 rounded-full transition-all duration-300 font-['Montserrat',sans-serif] ${
                   activeTab === "current"
                     ? "bg-red-700 text-white"
                     : "bg-transparent text-gray-400 hover:text-white border border-gray-700"
                 }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Membros Atuais
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => setActiveTab("former")}
                 className={`px-4 py-2 rounded-full transition-all duration-300 font-['Montserrat',sans-serif] ${
                   activeTab === "former"
                     ? "bg-red-700 text-white"
                     : "bg-transparent text-gray-400 hover:text-white border border-gray-700"
                 }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Antigos Membros
-              </button>
+              </motion.button>
             </div>
             <div className="mt-4">
-              <Link 
-                href="/membros"
-                className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif] mx-auto w-max"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
               >
-                Ver todos os membros{" "}
-                <span className="ml-2 transform transition-transform duration-300 group-hover:translate-x-1">→</span>
-              </Link>
+                <Link 
+                  href="/membros"
+                  className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif] mx-auto w-max"
+                >
+                  Ver todos os membros{" "}
+                  <span className="ml-2 transform transition-transform duration-300 group-hover:translate-x-1">→</span>
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
 
@@ -647,83 +655,99 @@ export default function LandingPage() {
               <p className="mt-4 text-gray-400">Carregando membros...</p>
             </div>
           ) : (
-            <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-              variants={membersTabVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {/* Get selected members to display using our function */}
-              {(activeTab === "current" ? activeMembers : formerMembers).map((member) => (
-                <div key={member.id} className="h-[420px]">
-                  <FlippableCard 
-                    frontContent={
-                      <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:shadow-red-500/10">
-                        <div className="overflow-hidden h-64">
-                          <img
-                            src={member.image || "/placeholder.svg"}
-                            alt={member.name}
-                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                          />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ 
+                  duration: 0.5,
+                  staggerChildren: 0.08
+                }}
+              >
+                {/* Get selected members to display using our function */}
+                {(activeTab === "current" ? activeMembers : formerMembers).map((member, index) => (
+                  <motion.div 
+                    key={member.id} 
+                    className="h-[420px]"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      duration: 0.5,
+                      delay: index * 0.05,
+                      ease: [0.25, 0.1, 0.25, 1]
+                    }}
+                  >
+                    <FlippableCard 
+                      frontContent={
+                        <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:shadow-red-500/10">
+                          <div className="overflow-hidden h-64">
+                            <img
+                              src={member.image || "/placeholder.svg"}
+                              alt={member.name}
+                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                            />
+                          </div>
+                          <div className="p-6">
+                            <h3 className="text-xl font-bold mb-1 font-['Playfair_Display',serif]">{member.name}</h3>
+                            {member.nickname && (
+                              <p className="text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">"{member.nickname}"</p>
+                            )}
+                            <p className="text-gray-400 mb-2 font-['Montserrat',sans-serif]">{member.role}</p>
+                            {/* Display special role tags */}
+                            {member.specialRole && (
+                              <span className="inline-block bg-red-700/20 text-red-400 text-xs px-2 py-1 rounded-full mb-2 font-['Montserrat',sans-serif]">
+                                {member.specialRole}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="p-6">
-                          <h3 className="text-xl font-bold mb-1 font-['Playfair_Display',serif]">{member.name}</h3>
+                      }
+                      backContent={
+                        <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
+                          <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{member.name}</h3>
                           {member.nickname && (
-                            <p className="text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">"{member.nickname}"</p>
+                            <p className="text-red-500 text-lg mb-2 font-['Montserrat',sans-serif]">
+                              "{member.nickname}"
+                            </p>
                           )}
-                          <p className="text-gray-400 mb-2 font-['Montserrat',sans-serif]">{member.role}</p>
-                          {/* Display special role tags */}
+                          {/* Add special role display */}
                           {member.specialRole && (
-                            <span className="inline-block bg-red-700/20 text-red-400 text-xs px-2 py-1 rounded-full mb-2 font-['Montserrat',sans-serif]">
-                              {member.specialRole}
-                            </span>
-                          )}
-                          <p className="text-gray-500 text-sm font-['Montserrat',sans-serif]">Desde {member.joinYear}</p>
-                        </div>
-                      </div>
-                    }
-                    backContent={
-                      <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
-                        <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{member.name}</h3>
-                        {member.nickname && (
-                          <p className="text-red-500 text-lg mb-2 font-['Montserrat',sans-serif]">
-                            "{member.nickname}"
-                          </p>
-                        )}
-                        {/* Add special role display */}
-                        {member.specialRole && (
-                          <div className="bg-red-700/20 mb-3 px-3 py-2 rounded-lg inline-block">
-                            <p className="text-red-400 font-semibold font-['Montserrat',sans-serif]">{member.specialRole}</p>
-                          </div>
-                        )}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          <div className="bg-gray-800 px-3 py-1 rounded-lg">
-                            <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Instrumento</p>
-                            <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.role}</p>
-                          </div>
-                          <div className="bg-gray-800 px-3 py-1 rounded-lg">
-                            <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Desde</p>
-                            <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.joinYear}</p>
-                          </div>
-                          {member.course && (
-                            <div className="bg-gray-800 px-3 py-1 rounded-lg">
-                              <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Curso</p>
-                              <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.course}</p>
+                            <div className="bg-red-700/20 mb-3 px-3 py-2 rounded-lg inline-block">
+                              <p className="text-red-400 font-semibold font-['Montserrat',sans-serif]">{member.specialRole}</p>
                             </div>
                           )}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            <div className="bg-gray-800 px-3 py-1 rounded-lg">
+                              <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Instrumento</p>
+                              <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.role}</p>
+                            </div>
+                            <div className="bg-gray-800 px-3 py-1 rounded-lg">
+                              <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Desde</p>
+                              <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.joinYear}</p>
+                            </div>
+                            {member.course && (
+                              <div className="bg-gray-800 px-3 py-1 rounded-lg">
+                                <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Curso</p>
+                                <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.course}</p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="prose prose-sm prose-invert max-w-none font-['Montserrat',sans-serif] flex-grow overflow-y-auto">
+                            <p className="text-gray-300 text-sm">{member.bio}</p>
+                          </div>
+                          <div className="mt-4 text-center">
+                            <span className="text-xs text-gray-500 font-['Montserrat',sans-serif]">Clique para voltar</span>
+                          </div>
                         </div>
-                        <div className="prose prose-sm prose-invert max-w-none font-['Montserrat',sans-serif] flex-grow overflow-y-auto">
-                          <p className="text-gray-300 text-sm">{member.bio}</p>
-                        </div>
-                        <div className="mt-4 text-center">
-                          <span className="text-xs text-gray-500 font-['Montserrat',sans-serif]">Clique para voltar</span>
-                        </div>
-                      </div>
-                    }
-                  />
-                </div>
-              ))}
-            </motion.div>
+                      }
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
           )}
         </div>
       </section>
@@ -853,15 +877,14 @@ export default function LandingPage() {
 
           <motion.div
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="hidden"
-            animate={performancesVisible ? "visible" : "hidden"}
+            initial={{ opacity: 0 }}
+            animate={performancesVisible ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
             {performances.map((performance) => (
-              <motion.div
+              <div
                 key={performance.id}
                 className="bg-gray-900 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
-                variants={staggerItem}
               >
                 {performance.image && (
                   <div className="overflow-hidden">
@@ -890,7 +913,7 @@ export default function LandingPage() {
                     </span>
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </motion.div>
         </div>

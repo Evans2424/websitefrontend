@@ -6,6 +6,14 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    // Add experimental features that might help with module resolution
+    serverComponentsExternalPackages: [],
+  },
+  webpack: (config, { isServer }) => {
+    // Add custom webpack configuration to help with module resolution
+    return config;
+  },
   async headers() {
     return [
       {

@@ -76,13 +76,46 @@ const staggerContainer = {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+      when: "beforeChildren"
     },
   },
+  exit: {
+    opacity: 0, 
+    transition: { 
+      staggerChildren: 0.05,
+      staggerDirection: -1,
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1],
+      when: "afterChildren"
+    }
+  }
 }
 
 const staggerItem = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.5, 
+      ease: [0.22, 1, 0.36, 1] 
+    } 
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: {
+      duration: 0.3,
+      ease: [0.22, 1, 0.36, 1]
+    }
+  }
+}
+
+const fadeIn = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 }
 
 export default function AllNews() {

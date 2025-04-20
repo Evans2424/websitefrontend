@@ -102,7 +102,7 @@ export default function MembersPage() {
               Membros da TEUP
             </h1>
             <p className="text-gray-400 max-w-2xl mx-auto font-['Montserrat',sans-serif]">
-              Conheça todos os membros que fazem parte da história da nossa tuna, desde os veteranos Mestre-Tunos até os mais novos Caloiros.
+              Conheça todos os membros que fazem parte da história da nossa tuna, desde os Mestre-Tunos até os mais novos Caloiros.
             </p>
           </motion.div>
         </div>
