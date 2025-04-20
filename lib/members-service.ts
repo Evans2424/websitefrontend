@@ -29,12 +29,12 @@ export interface Member {
   role: MemberRole;
   hierarchy: MemberHierarchy;
   specialRole?: SpecialRole;
-  joinYear: number;
   course?: string;
-  bio: string;
   image: string;
   isLeader?: boolean;
   isActive: boolean;
+  tuneName?: string;    // Nome de Tuno - name given when becoming an official tuno
+  godfather?: number;   // Padrinho - ID reference to another member who is the godfather
 }
 
 // Mock members (consolidated list)
@@ -47,12 +47,12 @@ const mockMembers: Member[] = [
     role: "Violão",
     hierarchy: "Mestre-Tuno",
     specialRole: "Magister", // The only active Magister
-    joinYear: 2018,
     course: "Engenharia Informática",
-    bio: "João é o líder musical da tuna desde 2020. Com mais de 10 anos de experiência em violão clássico, tem sido fundamental na preparação dos novos arranjos musicais.",
     image: "/images/members/placeholder.png",
     isLeader: true,
-    isActive: true
+    isActive: true,
+    tuneName: "Nota Alta",
+    godfather: 105
   },
   {
     id: 2,
@@ -61,11 +61,11 @@ const mockMembers: Member[] = [
     role: "Bandolim",
     hierarchy: "Tuno",
     specialRole: "Ensaiador", // The only active Ensaiador
-    joinYear: 2019,
     course: "Engenharia Civil",
-    bio: "Miguel é conhecido por criar letras originais para as músicas da tuna. O seu bandolim e criatividade são distintivos no som do grupo.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Melodia",
+    godfather: 1
   },
   {
     id: 3,
@@ -74,11 +74,11 @@ const mockMembers: Member[] = [
     role: "Viola",
     hierarchy: "Tuno",
     specialRole: "Diretor Artístico", // The active Diretor Artístico
-    joinYear: 2017,
     course: "Engenharia Mecânica",
-    bio: "Apesar do apelido 'Baixinho', Pedro é um dos membros mais altos da tuna. Um especialista em viola que traz uma visão artística para todas as apresentações da tuna.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Harmonia",
+    godfather: 108
   },
   {
     id: 4,
@@ -87,11 +87,10 @@ const mockMembers: Member[] = [
     role: "Violão",
     hierarchy: "Caloiro",
     specialRole: null,
-    joinYear: 2020,
     course: "Engenharia Eletrotécnica",
-    bio: "António é o mais recente talento da TEUP. Como assistente do Maestro, ajuda a coordenar os ensaios e a preparar novos membros.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    godfather: 1
   },
   {
     id: 5,
@@ -100,11 +99,11 @@ const mockMembers: Member[] = [
     role: "Cavaquinho",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2018,
     course: "Engenharia Química",
-    bio: "O som inconfundível do cavaquinho de André dá um toque autêntico às músicas tradicionais. Também é o responsável pela manutenção dos instrumentos.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Tamboril",
+    godfather: 110
   },
   {
     id: 6,
@@ -113,11 +112,11 @@ const mockMembers: Member[] = [
     role: "Acordeão",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2019,
     course: "Engenharia Ambiental",
-    bio: "Ricardo aprendeu a tocar acordeão com o avô e traz esse legado familiar à TEUP. É também o encarregado da logística nas viagens internacionais.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Vento",
+    godfather: 109
   },
   {
     id: 7,
@@ -126,11 +125,10 @@ const mockMembers: Member[] = [
     role: "Percussão",
     hierarchy: "Caloiro",
     specialRole: null,
-    joinYear: 2021,
     course: "Engenharia de Materiais",
-    bio: "Tiago mantém o ritmo com as suas habilidades de percussão. Também é responsável por organizar muitas das nossas atuações.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    godfather: 2
   },
   {
     id: 8,
@@ -139,11 +137,10 @@ const mockMembers: Member[] = [
     role: "Contrabaixo",
     hierarchy: "Caloiro",
     specialRole: null,
-    joinYear: 2020,
     course: "Engenharia Física",
-    bio: "Rui fornece a base do nosso som com o seu contrabaixo. O seu conhecimento de teoria musical ajuda a arranjar as nossas peças tradicionais.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    godfather: 3
   },
   {
     id: 9,
@@ -152,11 +149,11 @@ const mockMembers: Member[] = [
     role: "Voz",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2017,
     course: "Engenharia Civil",
-    bio: "Duarte é conhecido pela sua voz potente e expressiva. Frequentemente interpreta os solos vocais mais complexos e é responsável pelos ensaios de canto em grupo.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Tenor",
+    godfather: 1
   },
   {
     id: 10,
@@ -165,11 +162,11 @@ const mockMembers: Member[] = [
     role: "Bandolim",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2019,
     course: "Engenharia Mecânica",
-    bio: "Gustavo é reconhecido pela sua técnica refinada no bandolim. Participa ativamente na criação de novos arranjos e adaptações para o repertório da tuna.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Cordas",
+    godfather: 2
   },
   {
     id: 11,
@@ -178,11 +175,11 @@ const mockMembers: Member[] = [
     role: "Flauta",
     hierarchy: "Mestre-Tuno",
     specialRole: null,
-    joinYear: 2016,
     course: "Engenharia Informática",
-    bio: "Henrique traz um toque de elegância às nossas músicas com sua flauta. Com formação clássica, introduz elementos que enriquecem o som tradicional da tuna.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Sopro",
+    godfather: 117
   },
   {
     id: 12,
@@ -191,11 +188,11 @@ const mockMembers: Member[] = [
     role: "Pandeireta",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2018,
     course: "Engenharia Eletrotécnica",
-    bio: "Lucas é o mestre da pandeireta, criando ritmos intrincados que complementam perfeitamente as melodias da tuna. Também é um excelente dançarino.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Compasso",
+    godfather: 104
   },
   {
     id: 13,
@@ -204,11 +201,10 @@ const mockMembers: Member[] = [
     role: "Viola",
     hierarchy: "Caloiro",
     specialRole: null,
-    joinYear: 2022,
     course: "Engenharia de Computadores",
-    bio: "Filipe entrou recentemente na tuna, mas já demonstra grande talento com a viola. Vem de uma família de músicos e traz novas ideias para o grupo.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    godfather: 3
   },
   {
     id: 14,
@@ -217,11 +213,11 @@ const mockMembers: Member[] = [
     role: "Violão",
     hierarchy: "Mestre-Tuno",
     specialRole: null,
-    joinYear: 2015,
     course: "Engenharia Química",
-    bio: "Daniel é um dos membros mais experientes da tuna. Seu domínio do violão e conhecimento das tradições tunantes são essenciais para manter a autenticidade do grupo.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Trovador",
+    godfather: 105
   },
   {
     id: 15,
@@ -230,11 +226,11 @@ const mockMembers: Member[] = [
     role: "Cavaquinho",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2018,
     course: "Engenharia Ambiental",
-    bio: "Bernardo toca o cavaquinho com uma energia contagiante. Sua presença no palco sempre anima o público e os outros membros da tuna.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Ponteio",
+    godfather: 110
   },
   {
     id: 16,
@@ -243,11 +239,11 @@ const mockMembers: Member[] = [
     role: "Contrabaixo",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2019,
     course: "Engenharia de Materiais",
-    bio: "Mateus é o segundo contrabaixista da tuna, trazendo profundidade ao som do grupo. Também tem talento para arranjos e composição musical.",
     image: "/images/members/placeholder.png",
-    isActive: true
+    isActive: true,
+    tuneName: "Gravidade",
+    godfather: 112
   },
   
   // Former Members (non-active) - 14+
@@ -258,11 +254,10 @@ const mockMembers: Member[] = [
     role: "Violão",
     hierarchy: "Mestre-Tuno",
     specialRole: "Diretor Artístico",
-    joinYear: 2000,
     course: "Engenharia Civil",
-    bio: "Manuel foi um dos membros fundadores da TEUP em 1990. Continuou como membro honorário até 2015, sempre presente nos eventos mais importantes.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Pioneiro"
   },
   {
     id: 102,
@@ -271,11 +266,11 @@ const mockMembers: Member[] = [
     role: "Voz",
     hierarchy: "Mestre-Tuno",
     specialRole: null,
-    joinYear: 2005,
     course: "Engenharia Mecânica",
-    bio: "A voz tenor de Carlos foi elemento central na TEUP durante mais de uma década. Participou em todas as gravações dos álbuns do grupo.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Barítono",
+    godfather: 101
   },
   {
     id: 103,
@@ -284,11 +279,11 @@ const mockMembers: Member[] = [
     role: "Bandolim",
     hierarchy: "Mestre-Tuno",
     specialRole: "Diretor Artístico",
-    joinYear: 2008,
     course: "Engenharia Informática",
-    bio: "Joaquim revolucionou o som da tuna com seu bandolim virtuoso. Foi diretor musical de 2010 a 2017 e compôs várias músicas originais.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Maestro",
+    godfather: 101
   },
   {
     id: 104,
@@ -297,11 +292,11 @@ const mockMembers: Member[] = [
     role: "Pandeireta",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2012,
     course: "Engenharia Química",
-    bio: "Fernando era conhecido por suas habilidades impressionantes com a pandeireta. Também foi tesoureiro da TEUP por vários anos.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Batuque",
+    godfather: 101
   },
   {
     id: 105,
@@ -310,11 +305,11 @@ const mockMembers: Member[] = [
     role: "Violão",
     hierarchy: "Mestre-Tuno",
     specialRole: "Magister",
-    joinYear: 2002,
     course: "Engenharia Civil",
-    bio: "José liderou a tuna por mais de 8 anos, estabelecendo muitas das tradições que seguimos até hoje. Foi um dos primeiros a levar a TEUP para festivais internacionais.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Regente",
+    godfather: 117
   },
   {
     id: 106,
@@ -323,11 +318,11 @@ const mockMembers: Member[] = [
     role: "Flauta",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2010,
     course: "Engenharia Mecânica",
-    bio: "António trouxe elegância às apresentações com sua flauta transversal. Era conhecido por seus solos impressionantes que cativavam o público.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Melífluo",
+    godfather: 103
   },
   {
     id: 107,
@@ -336,11 +331,11 @@ const mockMembers: Member[] = [
     role: "Voz",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2009,
     course: "Engenharia Informática",
-    bio: "A voz barítono de Miguel era inconfundível. Durante sua passagem pela TEUP, foi responsável por muitos dos arranjos vocais que ainda usamos.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Eco",
+    godfather: 102
   },
   {
     id: 108,
@@ -349,11 +344,11 @@ const mockMembers: Member[] = [
     role: "Viola",
     hierarchy: "Mestre-Tuno",
     specialRole: "Ensaiador",
-    joinYear: 2007,
     course: "Engenharia Eletrotécnica",
-    bio: "Pedro compôs várias músicas originais que se tornaram parte do repertório permanente da TEUP. Foi um pioneiro em mesclar estilos tradicionais com influências contemporâneas.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Partitura",
+    godfather: 103
   },
   {
     id: 109,
@@ -362,11 +357,11 @@ const mockMembers: Member[] = [
     role: "Acordeão",
     hierarchy: "Mestre-Tuno",
     specialRole: null,
-    joinYear: 2006,
     course: "Engenharia Civil",
-    bio: "Afonso foi um virtuoso do acordeão, trazendo um som único e autêntico à tuna. Participou em diversas digressões internacionais, representando a TEUP.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Teclas",
+    godfather: 105
   },
   {
     id: 110,
@@ -375,11 +370,11 @@ const mockMembers: Member[] = [
     role: "Cavaquinho",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2011,
     course: "Engenharia Mecânica",
-    bio: "Roberto era conhecido pela sua técnica excepcional no cavaquinho, criando melodias que se tornaram marca registrada de várias apresentações da TEUP.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Braguinha",
+    godfather: 103
   },
   {
     id: 111,
@@ -388,11 +383,11 @@ const mockMembers: Member[] = [
     role: "Percussão",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2010,
     course: "Engenharia Informática",
-    bio: "Leonardo trazia energia e precisão rítmica às performances da tuna. Seu talento com diversos instrumentos de percussão ampliou as possibilidades musicais do grupo.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Cadência",
+    godfather: 104
   },
   {
     id: 112,
@@ -401,11 +396,11 @@ const mockMembers: Member[] = [
     role: "Contrabaixo",
     hierarchy: "Mestre-Tuno",
     specialRole: null,
-    joinYear: 2004,
     course: "Engenharia Eletrotécnica",
-    bio: "Gabriel foi responsável por estabelecer o papel do contrabaixo na TEUP. Sua abordagem inovadora influencia até hoje o som característico da tuna.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Fundação",
+    godfather: 105
   },
   {
     id: 113,
@@ -414,11 +409,10 @@ const mockMembers: Member[] = [
     role: "Viola",
     hierarchy: "Caloiro",
     specialRole: null,
-    joinYear: 2015,
     course: "Engenharia Ambiental",
-    bio: "Alberto, apesar de ter permanecido pouco tempo na tuna como caloiro, deixou sua marca com performances memoráveis e contribuições valiosas ao repertório.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    godfather: 108
   },
   {
     id: 114,
@@ -427,11 +421,11 @@ const mockMembers: Member[] = [
     role: "Bandolim",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2008,
     course: "Engenharia Química",
-    bio: "Victor era admirado pela sua técnica refinada no bandolim. Participou ativamente em concursos nacionais, representando a TEUP com distinção.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Dedilhado",
+    godfather: 103
   },
   {
     id: 115,
@@ -440,11 +434,11 @@ const mockMembers: Member[] = [
     role: "Flauta",
     hierarchy: "Tuno",
     specialRole: null,
-    joinYear: 2009,
     course: "Engenharia Civil",
-    bio: "Eduardo trouxe um toque de sofisticação à tuna com sua flauta. Foi responsável por introduzir novos gêneros musicais ao repertório tradicional.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Cantábile",
+    godfather: 106
   },
   {
     id: 116,
@@ -453,11 +447,10 @@ const mockMembers: Member[] = [
     role: "Voz",
     hierarchy: "Caloiro",
     specialRole: null,
-    joinYear: 2013,
     course: "Engenharia de Materiais",
-    bio: "Renato tinha formação em canto lírico, o que trouxe uma dimensão diferente às interpretações vocais da tuna durante seu breve período como membro.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    godfather: 107
   },
   {
     id: 117,
@@ -466,13 +459,23 @@ const mockMembers: Member[] = [
     role: "Violão",
     hierarchy: "Mestre-Tuno",
     specialRole: "Magister",
-    joinYear: 1998,
     course: "Engenharia Informática",
-    bio: "Paulo foi um dos primeiros Magisters da TEUP, estabelecendo muitas das tradições e rituais que são seguidos até hoje. Seu estilo de liderança inspirou gerações de tunos.",
     image: "/images/members/placeholder.png",
-    isActive: false
+    isActive: false,
+    tuneName: "Patriarca"
   }
 ];
+
+// Helper function to get member by ID
+export const getMemberById = (id: number): Member | undefined => {
+  return mockMembers.find(member => member.id === id);
+};
+
+// Function to get godfather information by godfather ID
+export const getGodfatherInfo = (godfatherId: number | undefined): Member | undefined => {
+  if (!godfatherId) return undefined;
+  return getMemberById(godfatherId);
+};
 
 export interface MembersResponse {
   members: Member[];

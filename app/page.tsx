@@ -686,15 +686,29 @@ export default function LandingPage() {
                           <div className="overflow-hidden h-64">
                             <img
                               src={member.image || "/placeholder.svg"}
-                              alt={member.name}
+                              alt={member.nickname || member.name}
                               className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                             />
                           </div>
                           <div className="p-6">
-                            <h3 className="text-xl font-bold mb-1 font-['Playfair_Display',serif]">{member.name}</h3>
+                            {/* Show nickname as primary name when available */}
+                            <h3 className="text-xl font-bold mb-1 font-['Playfair_Display',serif]">
+                              {member.nickname || member.name}
+                            </h3>
+                            
+                            {/* Show real name as secondary when nickname exists */}
                             {member.nickname && (
-                              <p className="text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">"{member.nickname}"</p>
+                              <p className="text-gray-400 text-sm mb-2 font-['Montserrat',sans-serif]">
+                                {member.name}
+                              </p>
                             )}
+                            
+                            {member.tuneName && (
+                              <p className="text-amber-400 text-sm mb-2 font-['Montserrat',sans-serif] italic">
+                                {member.tuneName}
+                              </p>
+                            )}
+                            
                             <p className="text-gray-400 mb-2 font-['Montserrat',sans-serif]">{member.role}</p>
                             {/* Display special role tags */}
                             {member.specialRole && (
@@ -707,12 +721,24 @@ export default function LandingPage() {
                       }
                       backContent={
                         <div className="bg-gray-900 h-full rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 p-6 flex flex-col">
-                          <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{member.name}</h3>
+                          {/* Main title - nickname if available, otherwise name */}
+                          <h3 className="text-xl font-bold mb-1 font-['Playfair_Display',serif]">
+                            {member.nickname || member.name}
+                          </h3>
+                          
+                          {/* Show real name as secondary when nickname exists */}
                           {member.nickname && (
-                            <p className="text-red-500 text-lg mb-2 font-['Montserrat',sans-serif]">
-                              "{member.nickname}"
+                            <p className="text-gray-300 mb-2 font-['Montserrat',sans-serif]">
+                              {member.name}
                             </p>
                           )}
+                          
+                          {member.tuneName && (
+                            <p className="text-amber-400 text-sm mb-2 font-['Montserrat',sans-serif] italic">
+                              <span className="text-gray-500 not-italic">Nome de Tuno:</span> {member.tuneName}
+                            </p>
+                          )}
+                          
                           {/* Add special role display */}
                           {member.specialRole && (
                             <div className="bg-red-700/20 mb-3 px-3 py-2 rounded-lg inline-block">
@@ -725,8 +751,8 @@ export default function LandingPage() {
                               <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.role}</p>
                             </div>
                             <div className="bg-gray-800 px-3 py-1 rounded-lg">
-                              <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Desde</p>
-                              <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.joinYear}</p>
+                              <p className="text-xs text-gray-400 font-['Montserrat',sans-serif]">Hierarquia</p>
+                              <p className="text-sm font-medium font-['Montserrat',sans-serif]">{member.hierarchy}</p>
                             </div>
                             {member.course && (
                               <div className="bg-gray-800 px-3 py-1 rounded-lg">
@@ -735,10 +761,37 @@ export default function LandingPage() {
                               </div>
                             )}
                           </div>
-                          <div className="prose prose-sm prose-invert max-w-none font-['Montserrat',sans-serif] flex-grow overflow-y-auto">
-                            <p className="text-gray-300 text-sm">{member.bio}</p>
-                          </div>
-                          <div className="mt-4 text-center">
+
+                          {/* Godfather information - compact version */}
+                          {member.godfather && (
+                            <div className="mb-3">
+                              <Link 
+                                href={
+                                  /* Check if we need to link to former members page based on godfather ID */
+                                  member.godfather > 100 
+                                    ? `/membros?search=${encodeURIComponent(member.godfather.toString())}&display=former` 
+                                    : `/membros?search=${encodeURIComponent(member.godfather.toString())}`
+                                }
+                                className="godfather-link flex items-center gap-2 bg-gray-800 p-2 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors"
+                              >
+                                <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
+                                  <img 
+                                    src="/placeholder.svg" 
+                                    alt="Padrinho"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="flex-1 overflow-hidden">
+                                  <p className="text-sm font-medium truncate text-gray-200">Padrinho</p>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </Link>
+                            </div>
+                          )}
+                          
+                          <div className="mt-auto text-center">
                             <span className="text-xs text-gray-500 font-['Montserrat',sans-serif]">Clique para voltar</span>
                           </div>
                         </div>

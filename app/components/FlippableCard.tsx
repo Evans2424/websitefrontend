@@ -1,89 +1,60 @@
 "use client"
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
 
 interface FlippableCardProps {
   frontContent: React.ReactNode;
   backContent: React.ReactNode;
   className?: string;
+  onGodfatherClick?: (godfatherId: number) => void;
 }
 
-const FlippableCard: React.FC<FlippableCardProps> = ({ frontContent, backContent, className }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
-  
-  // Fixed variants to work with latest framer-motion
-  const variants = {
-    front: {
-      rotateY: 0,
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut"
-      },
-      zIndex: 1
-    },
-    back: {
-      opacity: 0,
-      scale: 0.9,
-      zIndex: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut"
-      }
-    }
-  };
+const FlippableCard: React.FC<FlippableCardProps> = ({ 
+  frontContent, 
+  backContent, 
+  className,
+  onGodfatherClick 
+}) => {
+  const [isFlipped, setIsFlipped] = useState(false)
 
-  const backVariants = {
-    front: {
-      opacity: 0,
-      scale: 0.9,
-      zIndex: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut"
-      }
-    },
-    back: {
-      opacity: 1,
-      scale: 1,
-      zIndex: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut"
-      }
+  const handleClick = (e: React.MouseEvent) => {
+    // Don't flip if the click was on a godfather link
+    if ((e.target as HTMLElement).closest('.godfather-link')) {
+      return;
     }
-  };
+    
+    setIsFlipped(!isFlipped)
+  }
 
   return (
     <div 
-      className={`relative w-full h-full cursor-pointer ${className || ''}`}
-      onClick={() => setIsFlipped(!isFlipped)}
+      className={`h-full w-full perspective-1000 ${className || ''}`} 
+      onClick={handleClick}
     >
-      <div className="relative w-full h-full">
-        {/* Front face */}
-        <motion.div 
-          className="absolute w-full h-full"
-          animate={isFlipped ? "back" : "front"}
-          variants={variants}
-          initial="front"
-        >
+      <motion.div
+        className="h-full w-full relative preserve-3d cursor-pointer"
+        initial={false}
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{
+          duration: 0.6,
+          type: "spring",
+          stiffness: 200,
+          damping: 20
+        }}
+      >
+        <div className="backface-hidden absolute h-full w-full">
           {frontContent}
-        </motion.div>
-        
-        {/* Back face */}
-        <motion.div 
-          className="absolute w-full h-full"
-          animate={isFlipped ? "back" : "front"}
-          variants={backVariants}
-          initial="front"
+        </div>
+        <div 
+          className="backface-hidden absolute h-full w-full rotate-y-180"
+          style={{ transform: "rotateY(180deg)" }}
         >
           {backContent}
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </div>
-  );
-};
+  )
+}
 
-export default FlippableCard;
+export default FlippableCard

@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Member, MemberHierarchy, MemberRole, fetchActiveMembers, fetchFormerMembers } from "@/lib/members-service"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Member, MemberHierarchy, MemberRole, fetchActiveMembers, fetchFormerMembers, getGodfatherInfo } from "@/lib/members-service"
 import FlippableCard from "../components/FlippableCard"
 
 // Animation variants
@@ -34,13 +35,24 @@ const hasSpecialRole = (member: Member): boolean => {
 };
 
 export default function MembersPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [displayType, setDisplayType] = useState<"active" | "former">("active");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [hierarchyFilter, setHierarchyFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [godfatherInfo, setGodfatherInfo] = useState<{[key: number]: Member | undefined}>({});
   
+  // Handle URL search parameters
+  useEffect(() => {
+    const urlSearchParam = searchParams.get('search');
+    if (urlSearchParam) {
+      setSearchQuery(urlSearchParam);
+    }
+  }, [searchParams]);
+
   // Load all members
   useEffect(() => {
     const loadMembers = async () => {
@@ -52,6 +64,21 @@ export default function MembersPage() {
           : await fetchFormerMembers();
           
         setMembers(response.members);
+        
+        // Load godfather information for all members
+        const godfatherIds = response.members
+          .filter(m => m.godfather)
+          .map(m => m.godfather as number);
+          
+        const uniqueGodfatherIds = [...new Set(godfatherIds)];
+        const godfathersMap: {[key: number]: Member | undefined} = {};
+        
+        for (const id of uniqueGodfatherIds) {
+          godfathersMap[id] = getGodfatherInfo(id);
+        }
+        
+        setGodfatherInfo(godfathersMap);
+        
       } catch (error) {
         console.error("Error loading members:", error);
       } finally {
@@ -61,6 +88,43 @@ export default function MembersPage() {
     
     loadMembers();
   }, [displayType]);
+  
+  // Handler for godfather click
+  const handleGodfatherClick = (godfatherId: number) => {
+    // Get the godfather info
+    const godfather = godfatherInfo[godfatherId];
+    if (godfather) {
+      // Create a search string with the godfather's name or ID for exact matching
+      const searchName = godfather.nickname || godfather.name;
+      
+      // Check if the godfather is a former member and update display type accordingly
+      if (!godfather.isActive && displayType !== "former") {
+        setDisplayType("former");
+        
+        // We need to wait for the members to load before we can search
+        setTimeout(() => {
+          setSearchQuery(searchName);
+          // Update URL with search param and display type
+          const newParams = new URLSearchParams();
+          newParams.set('search', searchName);
+          newParams.set('display', 'former');
+          const newPathname = `/membros?${newParams.toString()}`;
+          router.push(newPathname, { scroll: false });
+        }, 500);
+      } else {
+        // Just update search if we're already on the correct display type
+        setSearchQuery(searchName);
+        // Update URL with search param and keep display type
+        const newParams = new URLSearchParams();
+        newParams.set('search', searchName);
+        if (displayType === "former") {
+          newParams.set('display', 'former');
+        }
+        const newPathname = `/membros?${newParams.toString()}`;
+        router.push(newPathname, { scroll: false });
+      }
+    }
+  };
   
   // Get all available roles for filtering
   const allRoles = Array.from(
@@ -80,15 +144,25 @@ export default function MembersPage() {
     // Apply hierarchy filter
     if (hierarchyFilter !== "all" && member.hierarchy !== hierarchyFilter) return false;
     
-    // Apply search query
+    // Apply search query - exact match for ID, nickname or name
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
-      return (
-        member.name.toLowerCase().includes(query) ||
-        (member.nickname && member.nickname.toLowerCase().includes(query)) ||
-        member.role.toLowerCase().includes(query) ||
-        (member.specialRole && member.specialRole.toLowerCase().includes(query))
-      );
+      
+      // Check for exact match on ID (if the search is a number)
+      if (!isNaN(Number(query)) && member.id === Number(query)) {
+        return true;
+      }
+      
+      // Check for exact match on name or nickname
+      if (
+        member.name.toLowerCase() === query || 
+        (member.nickname && member.nickname.toLowerCase() === query)
+      ) {
+        return true;
+      }
+      
+      // If no exact match is found, return false
+      return false;
     }
     
     return true;
@@ -210,14 +284,44 @@ export default function MembersPage() {
                 <label htmlFor="search" className="block text-sm font-medium text-gray-400 mb-2 font-['Montserrat',sans-serif]">
                   Pesquisar
                 </label>
-                <input
-                  id="search"
-                  type="text"
-                  placeholder="Buscar por nome, alcunha..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-['Montserrat',sans-serif]"
-                />
+                <div className="relative">
+                  <input
+                    id="search"
+                    type="text"
+                    placeholder="Buscar por nome, alcunha..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      // Update URL with search param without reload
+                      const newParams = new URLSearchParams(searchParams.toString());
+                      if (e.target.value) {
+                        newParams.set('search', e.target.value);
+                      } else {
+                        newParams.delete('search');
+                      }
+                      const newPathname = `/membros${newParams.toString() ? `?${newParams.toString()}` : ''}`;
+                      router.push(newPathname, { scroll: false });
+                    }}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-['Montserrat',sans-serif] pr-10"
+                  />
+                  {searchQuery && (
+                    <button 
+                      onClick={() => {
+                        setSearchQuery('');
+                        // Remove search param from URL
+                        const newParams = new URLSearchParams(searchParams.toString());
+                        newParams.delete('search');
+                        const newPathname = `/membros${newParams.toString() ? `?${newParams.toString()}` : ''}`;
+                        router.push(newPathname, { scroll: false });
+                      }}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
@@ -253,6 +357,7 @@ export default function MembersPage() {
               >
                 {filteredMembers.map((member) => {
                   const isSpecialRole = hasSpecialRole(member);
+                  const godfather = member.godfather ? godfatherInfo[member.godfather] : undefined;
                   
                   return (
                   <motion.div
@@ -284,11 +389,22 @@ export default function MembersPage() {
                             />
                           </div>
                           <div className={`p-6 ${isSpecialRole ? 'bg-gradient-to-b from-transparent to-red-900/10' : ''}`}>
-                            <h3 className={`text-xl font-bold mb-1 font-['Playfair_Display',serif] ${isSpecialRole ? 'text-red-100' : ''}`}>
-                              {member.name}
+                            {/* Show nickname as main title when available, else show name */}
+                            <h3 className={`text-2xl font-bold mb-1 font-['Playfair_Display',serif] ${isSpecialRole ? 'text-red-100' : ''}`}>
+                              {member.nickname || member.name}
                             </h3>
+                            
+                            {/* Show real name as secondary when nickname exists */}
                             {member.nickname && (
-                              <p className="text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">"{member.nickname}"</p>
+                              <p className="text-gray-400 mb-2 font-['Montserrat',sans-serif] text-sm">
+                                {member.name}
+                              </p>
+                            )}
+                            
+                            {member.tuneName && (
+                              <p className="text-amber-400 text-sm mb-2 font-['Montserrat',sans-serif] italic">
+                                {member.tuneName}
+                              </p>
                             )}
                             
                             <div className="flex flex-wrap gap-2 mb-2">
@@ -310,13 +426,9 @@ export default function MembersPage() {
                               )}
                             </div>
                             
+                            {/* Course */}
                             <p className={`${isSpecialRole ? 'text-gray-300' : 'text-gray-400'} mb-4 font-['Montserrat',sans-serif]`}>
-                              {member.course && <span>{member.course} • </span>}
-                              <span>Desde {member.joinYear}</span>
-                            </p>
-                            
-                            <p className={`${isSpecialRole ? 'text-gray-300' : 'text-gray-500'} line-clamp-3 mb-2 text-sm font-['Montserrat',sans-serif]`}>
-                              {member.bio}
+                              {member.course && <span>{member.course}</span>}
                             </p>
                             
                             <p className={`text-sm text-center ${isSpecialRole ? 'text-red-200/70' : 'text-gray-400'} italic mt-3 font-['Montserrat',sans-serif]`}>
@@ -331,11 +443,22 @@ export default function MembersPage() {
                               ? 'bg-gradient-to-br from-gray-800 via-gray-800 to-red-900/40 rounded-lg p-6 h-full flex flex-col border-2 border-red-900/40' 
                               : 'bg-gray-800 rounded-lg p-6 h-full flex flex-col'
                           }`}>
+                          {/* Main title - nickname if available, otherwise name */}
                           <h3 className={`text-xl font-bold mb-1 font-['Playfair_Display',serif] ${isSpecialRole ? 'text-red-100' : ''}`}>
-                            {member.name}
+                            {member.nickname || member.name}
                           </h3>
+                          
+                          {/* Show real name as secondary when nickname exists */}
                           {member.nickname && (
-                            <p className="text-red-500 text-lg mb-2 font-['Montserrat',sans-serif]">"{member.nickname}"</p>
+                            <p className="text-gray-300 mb-2 font-['Montserrat',sans-serif]">
+                              {member.name}
+                            </p>
+                          )}
+                          
+                          {member.tuneName && (
+                            <p className="text-amber-400 text-md mb-3 font-['Montserrat',sans-serif] italic">
+                              <span className="text-gray-500 not-italic">Nome de Tuno:</span> {member.tuneName}
+                            </p>
                           )}
                           
                           {/* Special role with more prominence */}
@@ -358,11 +481,6 @@ export default function MembersPage() {
                               <p className={`text-sm font-medium font-['Montserrat',sans-serif] ${isSpecialRole ? 'text-red-100' : ''}`}>{member.hierarchy}</p>
                             </div>
                             
-                            <div className={`${isSpecialRole ? 'bg-red-900/30 border border-red-900/50' : 'bg-gray-700'} px-3 py-2 rounded-lg`}>
-                              <p className={`text-xs ${isSpecialRole ? 'text-red-200/80' : 'text-gray-400'} font-['Montserrat',sans-serif]`}>Desde</p>
-                              <p className={`text-sm font-medium font-['Montserrat',sans-serif] ${isSpecialRole ? 'text-red-100' : ''}`}>{member.joinYear}</p>
-                            </div>
-                            
                             {member.course && (
                               <div className={`${isSpecialRole ? 'bg-red-900/30 border border-red-900/50' : 'bg-gray-700'} px-3 py-2 rounded-lg`}>
                                 <p className={`text-xs ${isSpecialRole ? 'text-red-200/80' : 'text-gray-400'} font-['Montserrat',sans-serif]`}>Curso</p>
@@ -371,9 +489,31 @@ export default function MembersPage() {
                             )}
                           </div>
                           
-                          <div className="prose prose-sm prose-invert max-w-none font-['Montserrat',sans-serif] flex-grow overflow-y-auto">
-                            <p className={`${isSpecialRole ? 'text-gray-200' : 'text-gray-300'} text-sm`}>{member.bio}</p>
-                          </div>
+                          {/* Compact Godfather section - only on back */}
+                          {godfather && (
+                            <div 
+                              className={`godfather-link flex items-center gap-2 ${isSpecialRole ? 'bg-red-900/30 border border-red-900/50' : 'bg-gray-700'} p-2 rounded-lg cursor-pointer hover:bg-opacity-80 transition-colors mt-2 mb-4`}
+                              onClick={() => handleGodfatherClick(member.godfather as number)}
+                            >
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
+                                <img 
+                                  src={godfather.image || "/placeholder.svg"} 
+                                  alt={godfather.nickname || godfather.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="flex-1 overflow-hidden">
+                                <p className={`text-sm font-medium truncate ${isSpecialRole ? 'text-white' : 'text-gray-200'}`}>
+                                  Padrinho: {godfather.nickname || godfather.name}
+                                </p>
+                              </div>
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          )}
+                          
+                          <div className="flex-grow"></div>
                           
                           <div className="mt-4 text-center">
                             <span className={`text-xs ${isSpecialRole ? 'text-red-200/60' : 'text-gray-500'} font-['Montserrat',sans-serif]`}>
