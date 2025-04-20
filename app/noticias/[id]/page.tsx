@@ -57,5 +57,8 @@ export default function NewsDetail() {
     return <NewsNotFound />
   }
 
-  return <NewsDetailClient newsItem={newsItem} />
+  // Get other news items (excluding the current one) to pass as related news
+  const otherNewsItems = newsItems.filter(item => item.id !== id);
+
+  return <NewsDetailClient newsItem={newsItem} otherNewsItems={otherNewsItems} />
 }

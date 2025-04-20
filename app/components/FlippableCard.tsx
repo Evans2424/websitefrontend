@@ -1,56 +1,70 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
-import { motion } from "framer-motion"
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 interface FlippableCardProps {
-  frontContent: React.ReactNode
-  backContent: React.ReactNode
-  className?: string
+  frontContent: React.ReactNode;
+  backContent: React.ReactNode;
+  className?: string;
 }
 
-const FlippableCard: React.FC<FlippableCardProps> = ({ frontContent, backContent, className = "" }) => {
-  const [isFlipped, setIsFlipped] = useState(false)
-
-  const toggleFlip = () => {
-    setIsFlipped(!isFlipped)
-  }
+const FlippableCard: React.FC<FlippableCardProps> = ({ frontContent, backContent, className }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+  
+  // Use a more sophisticated animation that prevents "pop-in" effects
+  const variants = {
+    front: {
+      rotateY: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeInOut"
+      }
+    },
+    back: {
+      rotateY: 180,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeInOut"
+      }
+    },
+    hidden: {
+      opacity: 0,
+      transition: {
+        duration: 0
+      }
+    }
+  };
 
   return (
     <div 
-      className={`${className} cursor-pointer perspective w-full h-full`} 
-      onClick={toggleFlip}
-      style={{ perspective: '1000px' }}
+      className={`perspective-1000 w-full h-full cursor-pointer ${className || ''}`}
+      onClick={() => setIsFlipped(!isFlipped)}
     >
-      <div 
-        className="relative w-full h-full transition-transform duration-500"
-        style={{ 
-          transformStyle: 'preserve-3d',
-          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
-        }}
-      >
-        {/* Front of card */}
-        <div 
-          className="absolute inset-0 w-full h-full backface-hidden"
-          style={{ backfaceVisibility: 'hidden' }}
+      <div className="relative preserve-3d w-full h-full transition-transform duration-500">
+        {/* Front face */}
+        <motion.div 
+          className="absolute backface-hidden w-full h-full"
+          animate={isFlipped ? "hidden" : "front"}
+          variants={variants}
         >
           {frontContent}
-        </div>
-
-        {/* Back of card */}
-        <div 
-          className="absolute inset-0 w-full h-full backface-hidden"
-          style={{ 
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)'
-          }}
+        </motion.div>
+        
+        {/* Back face */}
+        <motion.div 
+          className="absolute backface-hidden w-full h-full"
+          style={{ rotateY: "180deg" }}
+          animate={isFlipped ? "back" : "hidden"}
+          variants={variants}
         >
           {backContent}
-        </div>
+        </motion.div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FlippableCard
+export default FlippableCard;

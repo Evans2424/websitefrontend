@@ -89,17 +89,7 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-black text-white font-['Playfair_Display',serif]">
-      {/* Navigation */}
-      <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center">
-            <img src="/images/teup-logo.png" alt="TEUP Logo" className="h-10 w-10 mr-3" />
-            <span className="font-['Cinzel',serif]">TEUP</span>
-          </Link>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
+      {/* Hero Section with proper spacing for fixed navbar */}
       <section className="pt-28 pb-12">
         <div className="container mx-auto px-4">
           <motion.div
@@ -108,12 +98,6 @@ export default function GalleryPage() {
             transition={{ duration: 0.5 }}
             className="max-w-4xl mx-auto text-center"
           >
-            <Link
-              href="/"
-              className="inline-flex items-center text-gray-400 hover:text-white mb-6 transition-colors duration-300 font-['Montserrat',sans-serif]"
-            >
-              <FaArrowLeft className="mr-2" /> Voltar à página inicial
-            </Link>
             <h1 className="text-3xl md:text-5xl font-bold mb-6 font-['Cinzel',serif]">Galeria de Fotos</h1>
             <p className="text-gray-400 mb-8 font-['Montserrat',sans-serif]">
               Momentos capturados das nossas atuações, viagens e convívios.

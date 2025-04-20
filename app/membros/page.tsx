@@ -89,17 +89,7 @@ export default function MembersPage() {
 
   return (
     <div className="min-h-screen bg-black text-white font-['Playfair_Display',serif]">
-      {/* Navigation */}
-      <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center">
-            <img src="/images/teup-logo.png" alt="TEUP Logo" className="h-10 w-10 mr-3" />
-            <span className="font-['Cinzel',serif]">TEUP</span>
-          </Link>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
+      {/* Hero Section with proper spacing for fixed navbar */}
       <section className="pt-32 pb-16 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div 

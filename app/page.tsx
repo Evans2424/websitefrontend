@@ -110,27 +110,38 @@ const carouselImages = [
 // Animation variants - Make animations more subtle
 const fadeIn = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4 } },
+  visible: { opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
 }
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
 }
 
+// Smoother staggering animations for sections like News and Performances
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.05,
+      staggerChildren: 0.15,
+      delayChildren: 0.1,
+      duration: 0.6,
+      ease: "easeOut",
     },
   },
 }
 
 const staggerItem = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  hidden: { opacity: 0, y: 8 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.9, 
+      ease: [0.25, 0.1, 0.25, 1] // cubic-bezier curve for a smoother feel
+    } 
+  },
 }
 
 // Custom hook for intersection observer with options for improved performance
@@ -173,24 +184,6 @@ export default function LandingPage() {
   const [isLoadingMembers, setIsLoadingMembers] = useState(true);
   const [activeTab, setActiveTab] = useState<"current" | "former">("current");
   const [activeGalleryFilter, setActiveGalleryFilter] = useState("all");
-
-  // Fetch homepage members
-  useEffect(() => {
-    const loadMembers = async () => {
-      setIsLoadingMembers(true);
-      try {
-        const { activeMembers, formerMembers } = await fetchHomepageMembers();
-        setActiveMembers(activeMembers);
-        setFormerMembers(formerMembers);
-      } catch (error) {
-        console.error("Error loading members:", error);
-      } finally {
-        setIsLoadingMembers(false);
-      }
-    };
-
-    loadMembers();
-  }, []);
 
   // Function to get priority and random members for display
   const getMembersToDisplay = (members: Member[]) => {
@@ -268,6 +261,49 @@ export default function LandingPage() {
   const filteredGalleryImages =
     activeGalleryFilter === "all" ? galleryImages : galleryImages.filter((img) => img.category === activeGalleryFilter)
 
+  // Custom animation variants for smooth transitions between filtered items
+  const galleryGridVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.08,
+        when: "beforeChildren" 
+      }
+    }
+  };
+  
+  const galleryItemVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { 
+        duration: 0.6,
+        ease: [0.25, 0.1, 0.25, 1] 
+      }
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.9,
+      transition: {
+        duration: 0.3
+      }
+    }
+  };
+
+  // Modify animation variants for tab switching
+  const membersTabVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+  
   // Refs for sections with animations
   const [aboutRef, aboutVisible] = useIntersectionObserver({ threshold: 0.2 })
   const [newsRef, newsVisible] = useIntersectionObserver({ threshold: 0.2 })
@@ -276,6 +312,24 @@ export default function LandingPage() {
   const [performancesRef, performancesVisible] = useIntersectionObserver({ threshold: 0.2 })
   const [galleryRef, galleryVisible] = useIntersectionObserver({ threshold: 0.2 })
   const [contactRef, contactVisible] = useIntersectionObserver({ threshold: 0.2 })
+
+  // Fetch homepage members
+  useEffect(() => {
+    const loadMembers = async () => {
+      setIsLoadingMembers(true);
+      try {
+        const { activeMembers, formerMembers } = await fetchHomepageMembers();
+        setActiveMembers(activeMembers);
+        setFormerMembers(formerMembers);
+      } catch (error) {
+        console.error("Error loading members:", error);
+      } finally {
+        setIsLoadingMembers(false);
+      }
+    };
+
+    loadMembers();
+  }, []);
 
   return (
     <div className="min-h-screen bg-black text-white font-['Playfair_Display',serif] overflow-x-hidden w-full">
@@ -593,7 +647,12 @@ export default function LandingPage() {
               <p className="mt-4 text-gray-400">Carregando membros...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              variants={membersTabVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {/* Get selected members to display using our function */}
               {(activeTab === "current" ? activeMembers : formerMembers).map((member) => (
                 <div key={member.id} className="h-[420px]">
@@ -664,7 +723,7 @@ export default function LandingPage() {
                   />
                 </div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </section>
@@ -878,12 +937,21 @@ export default function LandingPage() {
 
           <motion.div
             className="grid grid-cols-2 md:grid-cols-3 gap-4"
-            variants={staggerContainer}
+            variants={galleryGridVariants}
             initial="hidden"
-            animate={galleryVisible ? "visible" : "hidden"}
+            animate="visible"
+            key={activeGalleryFilter} // This is important! It forces re-render on filter change
           >
             {filteredGalleryImages.map((image, index) => (
-              <motion.div key={index} className="overflow-hidden rounded-lg aspect-square" variants={staggerItem}>
+              <motion.div 
+                key={index + image.src} 
+                className="overflow-hidden rounded-lg aspect-square" 
+                variants={galleryItemVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                layout
+              >
                 <img
                   src={image.src || "/placeholder.svg"}
                   alt={image.alt}

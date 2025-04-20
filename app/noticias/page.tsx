@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { FaArrowLeft, FaCalendarAlt } from "react-icons/fa"
+import { FaCalendarAlt } from "react-icons/fa"
 import { useState } from "react"
 
 // News data
@@ -96,7 +96,7 @@ export default function AllNews() {
 
   return (
     <div className="min-h-screen bg-black text-white font-['Playfair_Display',serif]">
-      {/* Hero Section */}
+      {/* Hero Section with proper spacing for fixed navbar */}
       <section className="pt-28 pb-12">
         <div className="container mx-auto px-4">
           <motion.div
@@ -105,12 +105,6 @@ export default function AllNews() {
             transition={{ duration: 0.5 }}
             className="max-w-4xl mx-auto text-center"
           >
-            <Link
-              href="/"
-              className="inline-flex items-center text-gray-400 hover:text-white mb-6 transition-colors duration-300 font-['Montserrat',sans-serif]"
-            >
-              <FaArrowLeft className="mr-2" /> Voltar à página inicial
-            </Link>
             <h1 className="text-3xl md:text-5xl font-bold mb-6 font-['Cinzel',serif]">Notícias e Eventos</h1>
             <p className="text-gray-400 mb-8 font-['Montserrat',sans-serif]">
               Mantenha-se atualizado sobre as últimas novidades, conquistas e eventos da TEUP.

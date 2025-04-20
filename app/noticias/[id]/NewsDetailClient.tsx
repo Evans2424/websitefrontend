@@ -17,9 +17,10 @@ type NewsItem = {
 
 type NewsDetailClientProps = {
   newsItem: NewsItem
+  otherNewsItems: NewsItem[]
 }
 
-export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
+export default function NewsDetailClient({ newsItem, otherNewsItems }: NewsDetailClientProps) {
   // Format content with paragraphs
   const formattedContent = newsItem.content.split("\n\n").map((paragraph, index) => (
     <p key={index} className="mb-4">
@@ -29,18 +30,8 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
 
   return (
     <div className="min-h-screen bg-black text-white font-['Playfair_Display',serif]">
-      {/* Navigation */}
-      <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center">
-            <img src="/placeholder.svg?height=40&width=40" alt="TEUP Logo" className="h-10 w-10 mr-3" />
-            <span className="font-['Cinzel',serif]">TEUP</span>
-          </Link>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="pt-24 pb-12 relative">
+      {/* Hero Section with proper spacing for fixed navbar */}
+      <section className="pt-28 pb-12 relative">
         <div className="absolute inset-0 z-0">
           {newsItem.image && (
             <>
@@ -61,10 +52,10 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
             className="max-w-4xl mx-auto"
           >
             <Link
-              href="/"
+              href="/noticias"
               className="inline-flex items-center text-gray-400 hover:text-white mb-6 transition-colors duration-300 font-['Montserrat',sans-serif]"
             >
-              <FaArrowLeft className="mr-2" /> Voltar à página inicial
+              <FaArrowLeft className="mr-2" /> Voltar às notícias
             </Link>
             <h1 className="text-3xl md:text-5xl font-bold mb-4 font-['Cinzel',serif]">{newsItem.title}</h1>
             <div className="flex items-center text-gray-400 mb-8 font-['Montserrat',sans-serif]">
@@ -164,21 +155,74 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-8 font-['Cinzel',serif]">Outras Notícias</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* For related news, we would need to pass the newsItems data - for now just show a placeholder */}
-            <div className="bg-gray-900 rounded-lg p-6">
-              <p className="text-gray-400 font-['Montserrat',sans-serif]">
-                Veja mais notícias na nossa página principal.
-              </p>
-              <Link
-                href="/"
-                className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif] mt-4"
+            {otherNewsItems.slice(0, 3).map((item) => (
+              <motion.div
+                key={item.id}
+                className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
               >
-                Ir para a página principal{" "}
-                <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-            </div>
+                {item.image && (
+                  <div className="overflow-hidden h-48">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                    />
+                  </div>
+                )}
+                <div className="p-6">
+                  <div className="flex items-center text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">
+                    <FaCalendarAlt className="mr-2" />
+                    <span>{item.date}</span>
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 font-['Playfair_Display',serif]">{item.title}</h3>
+                  <p className="text-gray-400 mb-4 font-['Montserrat',sans-serif] line-clamp-3">{item.summary}</p>
+                  
+                  {/* Tags */}
+                  {item.tags && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {item.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-gray-700 text-xs rounded-full text-gray-300 font-['Montserrat',sans-serif]"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <Link
+                    href={`/noticias/${item.id}`}
+                    className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif]"
+                  >
+                    Ler mais{" "}
+                    <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
+                      →
+                    </span>
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+            
+            {otherNewsItems.length === 0 && (
+              <div className="bg-gray-900 rounded-lg p-6 col-span-3 text-center">
+                <p className="text-gray-400 font-['Montserrat',sans-serif]">
+                  Não há outras notícias disponíveis no momento.
+                </p>
+                <Link
+                  href="/noticias"
+                  className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center justify-center group font-['Montserrat',sans-serif] mt-4"
+                >
+                  Ver todas as notícias{" "}
+                  <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
+                    →
+                  </span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -189,7 +233,7 @@ export default function NewsDetailClient({ newsItem }: NewsDetailClientProps) {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center">
-                <img src="/placeholder.svg?height=40&width=40" alt="TEUP Logo" className="h-10 w-10 mr-3" />
+                <img src="/images/teup-logo.png" alt="TEUP Logo" className="h-10 w-10 mr-3" />
                 <span className="font-['Cinzel',serif]">TEUP</span>
               </Link>
               <p className="text-gray-400 mt-2 font-['Montserrat',sans-serif]">
