@@ -6,6 +6,10 @@ interface User {
   name: string;
   photo: string;
   role: 'admin' | 'member';
+  privileges?: {
+    canAddNews?: boolean;
+    canAddPerformances?: boolean;
+  };
 }
 
 const mockUsers: User[] = [
@@ -19,11 +23,27 @@ const mockUsers: User[] = [
   },
   {
     id: '2',
-    username: 'tunomember',
+    username: 'privilegedmember',
     password: 'tuno123',
     name: 'João Tuno',
-    photo: '/placeholder-user.jpg',
-    role: 'member'
+    photo: '/members/placeholder.png',
+    role: 'member',
+    privileges: {
+      canAddNews: true,
+      canAddPerformances: true
+    }
+  },
+  {
+    id: '3',
+    username: 'regularmember',
+    password: 'tuno456',
+    name: 'Miguel Tuno',
+    photo: '/members/placeholder.png',
+    role: 'member',
+    privileges: {
+      canAddNews: false,
+      canAddPerformances: false
+    }
   },
 ];
 
@@ -33,6 +53,10 @@ export interface AuthUser {
   name: string;
   photo: string;
   role: 'admin' | 'member';
+  privileges?: {
+    canAddNews?: boolean;
+    canAddPerformances?: boolean;
+  };
 }
 
 export interface LoginCredentials {

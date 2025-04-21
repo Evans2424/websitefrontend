@@ -19,6 +19,15 @@ interface NewsItem {
   content?: string
 }
 
+// Admin section features
+interface AdminFeature {
+  id: string;
+  title: string;
+  icon: JSX.Element;
+  description: string;
+  path: string;
+}
+
 const newsItems: NewsItem[] = [
   {
     id: 1,

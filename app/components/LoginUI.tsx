@@ -19,8 +19,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export default function LoginUI() {
+  const router = useRouter();
   const { user, login, logout, isLoading, error } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -69,6 +71,12 @@ export default function LoginUI() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={() => router.push('/area-membros')}
+            >
+              Área de Membros
+            </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
               Perfil
             </DropdownMenuItem>
@@ -76,7 +84,10 @@ export default function LoginUI() {
               Configurações
             </DropdownMenuItem>
             {user.role === 'admin' && (
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => router.push('/admin')}
+              >
                 Administração
               </DropdownMenuItem>
             )}

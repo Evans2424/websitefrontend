@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import NavBar from '@/app/components/NavBar'
+import NavBarWrapper from '@/app/components/NavBarWrapper'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AuthProvider } from './context/auth-context'
 import { MembersProvider } from './context/members-context'
@@ -41,7 +41,7 @@ export default function RootLayout({
         >
           <AuthProvider>
             <MembersProvider>
-              <NavBar />
+              <NavBarWrapper />
               {children}
             </MembersProvider>
           </AuthProvider>
