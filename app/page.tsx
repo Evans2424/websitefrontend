@@ -8,16 +8,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import ScrollToTop from "./components/ScrollToTop"
 import FlippableCard from "./components/FlippableCard"
 import { Member, fetchHomepageMembers, getGodfatherInfo } from "@/lib/members-service"
-
-// News/Events data
-interface NewsItem {
-  id: number
-  title: string
-  date: string
-  summary: string
-  image?: string
-  content?: string
-}
+import { NewsItem, fetchHomepageNews, formatDateForDisplay } from "@/lib/news-service"
+import { Performance, fetchHomepagePerformances } from "@/lib/performances-service"
 
 // Admin section features
 interface AdminFeature {
@@ -27,84 +19,6 @@ interface AdminFeature {
   description: string;
   path: string;
 }
-
-const newsItems: NewsItem[] = [
-  {
-    id: 1,
-    title: "TEUP vence Festival Internacional de Tunas",
-    date: "15 de Março, 2025",
-    summary:
-      "A Tuna de Engenharia da Universidade do Porto conquistou o primeiro lugar no prestigiado Festival Internacional de Tunas em Coimbra.",
-    image: "/images/teup-flag-performance.png",
-    content:
-      "A Tuna de Engenharia da Universidade do Porto (TEUP) conquistou o primeiro lugar no prestigiado Festival Internacional de Tunas em Coimbra. Após uma atuação memorável que incluiu clássicos do repertório tunante e algumas inovações musicais, o júri decidiu por unanimidade atribuir o prémio principal à nossa tuna. Este reconhecimento vem coroar meses de ensaios intensivos e dedicação de todos os membros. A competição contou com a participação de 12 tunas de diferentes países, incluindo Espanha, Brasil e Itália. Além do prémio principal, a TEUP também arrecadou o prémio de 'Melhor Instrumental' e 'Melhor Solista' para o nosso bandolinista António Ferreira. A vitória neste festival abre portas para futuras participações em eventos internacionais e consolida a posição da TEUP como uma das melhores tunas académicas de Portugal.",
-  },
-  {
-    id: 2,
-    title: "Novo CD 'Tradição Engenheira' já disponível",
-    date: "28 de Fevereiro, 2025",
-    summary:
-      "O mais recente trabalho da TEUP já está disponível em todas as plataformas digitais e na nossa loja online.",
-    image: "/images/teup-musicians.png",
-    content:
-      "É com grande orgulho que anunciamos o lançamento do nosso novo álbum 'Tradição Engenheira'. Este trabalho representa dois anos de dedicação e paixão pela música tradicional portuguesa, reinterpretada com o estilo único da TEUP. O álbum contém 12 faixas, incluindo clássicos do repertório tunante e três composições originais dos nossos membros. As gravações foram realizadas nos estúdios da Faculdade de Engenharia, com produção de João Silva, nosso atual Ensaiador. 'Tradição Engenheira' já está disponível em todas as plataformas digitais como Spotify, Apple Music e YouTube Music. Também é possível adquirir a versão física do CD através da nossa loja online ou nos nossos concertos. Parte das receitas das vendas será destinada ao fundo de bolsas para estudantes de Engenharia da UP. Agradecemos a todos que tornaram este projeto possível e esperamos que apreciem o resultado do nosso trabalho.",
-  },
-  {
-    id: 3,
-    title: "Inscrições abertas para novos tunos",
-    date: "10 de Janeiro, 2025",
-    summary:
-      "Estão abertas as inscrições para estudantes de Engenharia que queiram juntar-se à TEUP. As audições decorrerão durante o mês de Fevereiro.",
-    image: "/images/teup-university.png",
-    content:
-      "A Tuna de Engenharia da Universidade do Porto (TEUP) anuncia a abertura de inscrições para novos membros. Convidamos todos os estudantes da Faculdade de Engenharia que tenham interesse em música e nas tradições académicas a candidatarem-se. Procuramos principalmente instrumentistas de cordas (violão, bandolim, viola, cavaquinho), mas também estamos abertos a outros instrumentos e vozes. Não é necessário ter experiência prévia ou formação musical formal - o mais importante é a vontade de aprender e o compromisso com o grupo. As inscrições podem ser feitas através do formulário disponível no nosso site até 31 de Janeiro. As audições decorrerão durante o mês de Fevereiro, e os resultados serão anunciados até 15 de Março. Os selecionados passarão por um período de integração de seis meses antes de se tornarem membros efetivos. Junte-se a nós e faça parte desta tradição que já dura mais de três décadas!",
-  },
-]
-
-// Performance data
-interface Performance {
-  id: number
-  title: string
-  date: string
-  location: string
-  summary: string
-  image?: string
-  content?: string
-}
-
-const performances: Performance[] = [
-  {
-    id: 1,
-    title: "Festival Internacional de Tunas",
-    date: "15 de Maio, 2025",
-    location: "Coimbra, Portugal",
-    summary:
-      "A TEUP participará no prestigiado Festival Internacional de Tunas em Coimbra, competindo com tunas de toda a Europa.",
-    image: "/images/teup-flag-performance.png",
-    content:
-      "A TEUP tem a honra de participar no prestigiado Festival Internacional de Tunas em Coimbra, um dos eventos mais importantes do calendário tunante. Este festival, que celebra a sua 25ª edição, reúne as melhores tunas académicas de Portugal, Espanha e outros países europeus. A competição decorrerá no Grande Auditório da Universidade de Coimbra, com capacidade para mais de 1000 espectadores. Cada tuna terá 15 minutos para apresentar o seu repertório, sendo avaliada por um júri composto por professores de música e antigos tunos de renome. A TEUP preparou um programa especial para esta ocasião, incluindo clássicas baladas portuguesas e uma surpresa musical que promete impressionar o júri e o público. Os bilhetes para o evento já estão à venda e podem ser adquiridos através do site do festival ou na bilheteira da Universidade de Coimbra. Venha apoiar a TEUP neste importante evento!",
-  },
-  {
-    id: 2,
-    title: "Celebração do Aniversário da FEUP",
-    date: "10 de Junho, 2025",
-    location: "Auditório da FEUP, Porto",
-    summary: "Concerto especial para celebrar o aniversário da Faculdade de Engenharia da Universidade do Porto.",
-    image: "/images/teup-dance-performance.png",
-    content:
-      "A TEUP apresentará um concerto especial para celebrar o aniversário da Faculdade de Engenharia da Universidade do Porto. Este evento faz parte das comemorações oficiais da FEUP e contará com a presença de autoridades académicas, professores, alunos e ex-alunos. O concerto terá lugar no Auditório da FEUP, com início às 21h00. O programa incluirá um repertório que percorre a história da TEUP e da própria faculdade, com músicas que marcaram diferentes épocas ao longo das últimas décadas. Haverá também um momento especial de homenagem aos antigos membros da tuna, com a participação de alguns veteranos que se juntarão ao grupo para interpretar peças clássicas do repertório. A entrada é gratuita, mas sujeita à lotação da sala. Os interessados devem levantar o seu convite na Associação de Estudantes da FEUP a partir de 1 de Junho. Não perca esta oportunidade de celebrar connosco a história e as tradições da nossa faculdade!",
-  },
-  {
-    id: 3,
-    title: "Intercâmbio Cultural em Nice",
-    date: "22 de Julho, 2025",
-    location: "Nice, França",
-    summary: "A TEUP representará Portugal num intercâmbio cultural com grupos musicais universitários europeus.",
-    image: "/images/teup-nice.png",
-    content:
-      "A TEUP terá a honra de representar Portugal num importante intercâmbio cultural com grupos musicais universitários europeus, a realizar-se em Nice, França. Este evento, organizado pela Federação Europeia de Música Universitária, reúne anualmente grupos de diferentes tradições musicais académicas para promover o intercâmbio cultural e a amizade entre estudantes europeus. Durante uma semana, a TEUP participará em workshops, concertos conjuntos e apresentações individuais em vários locais emblemáticos da cidade francesa, incluindo a famosa Promenade des Anglais e a Place Masséna. Além das atuações, o programa inclui visitas culturais e momentos de convívio com os outros grupos participantes, provenientes de países como França, Espanha, Itália, Alemanha e Polónia. Esta será uma oportunidade única para a TEUP divulgar a cultura musical académica portuguesa e estabelecer contactos para futuras colaborações internacionais. A participação da TEUP neste evento é parcialmente financiada pela Universidade do Porto e pelo Instituto Camões.",
-  },
-]
 
 // Carousel images
 const carouselImages = [
@@ -197,7 +111,11 @@ function useIntersectionObserver(options = {}): [React.RefObject<HTMLElement>, b
 export default function LandingPage() {
   const [activeMembers, setActiveMembers] = useState<Member[]>([]);
   const [formerMembers, setFormerMembers] = useState<Member[]>([]);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [performances, setPerformances] = useState<Performance[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(true);
+  const [isLoadingNews, setIsLoadingNews] = useState(true);
+  const [isLoadingPerformances, setIsLoadingPerformances] = useState(true);
   const [activeTab, setActiveTab] = useState<"current" | "former">("current");
   const [activeGalleryFilter, setActiveGalleryFilter] = useState("all");
   const [godfatherInfo, setGodfatherInfo] = useState<Record<number, Member>>({});
@@ -330,9 +248,10 @@ export default function LandingPage() {
   const [galleryRef, galleryVisible] = useIntersectionObserver({ threshold: 0.2 })
   const [contactRef, contactVisible] = useIntersectionObserver({ threshold: 0.2 })
 
-  // Fetch homepage members
+  // Fetch homepage data
   useEffect(() => {
-    const loadMembers = async () => {
+    const loadHomepageData = async () => {
+      // Load members
       setIsLoadingMembers(true);
       try {
         const { activeMembers, formerMembers } = await fetchHomepageMembers();
@@ -368,9 +287,31 @@ export default function LandingPage() {
       } finally {
         setIsLoadingMembers(false);
       }
+
+      // Load news
+      setIsLoadingNews(true);
+      try {
+        const { news } = await fetchHomepageNews(3);
+        setNewsItems(news);
+      } catch (error) {
+        console.error("Error loading news:", error);
+      } finally {
+        setIsLoadingNews(false);
+      }
+
+      // Load performances
+      setIsLoadingPerformances(true);
+      try {
+        const { performances } = await fetchHomepagePerformances(3);
+        setPerformances(performances);
+      } catch (error) {
+        console.error("Error loading performances:", error);
+      } finally {
+        setIsLoadingPerformances(false);
+      }
     };
 
-    loadMembers();
+    loadHomepageData();
   }, []);
   
   // Function to handle godfather link clicks
@@ -606,43 +547,54 @@ export default function LandingPage() {
             </a>
           </motion.div>
 
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            initial={{ opacity: 0 }}
-            animate={newsVisible ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {newsItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-gray-900 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
-              >
-                {item.image && (
-                  <div className="overflow-hidden">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.title}
-                      className="w-full h-48 object-cover transition-transform duration-700 hover:scale-110"
-                    />
-                  </div>
-                )}
-                <div className="p-6">
-                  <p className="text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">{item.date}</p>
-                  <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{item.title}</h3>
-                  <p className="text-gray-400 mb-4 font-['Montserrat',sans-serif]">{item.summary}</p>
-                  <Link
-                    href={`/noticias/${item.id}`}
-                    className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif]"
-                  >
-                    Ler mais{" "}
-                    <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
-                      →
-                    </span>
-                  </Link>
-                </div>
+          {isLoadingNews ? (
+            <div className="text-center py-20">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-red-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                <span className="sr-only">Carregando...</span>
               </div>
-            ))}
-          </motion.div>
+              <p className="mt-4 text-gray-400">Carregando notícias...</p>
+            </div>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-3 gap-8"
+              initial={{ opacity: 0 }}
+              animate={newsVisible ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {newsItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-gray-900 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
+                >
+                  {item.image && (
+                    <div className="overflow-hidden">
+                      <img
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.title}
+                        className="w-full h-48 object-cover transition-transform duration-700 hover:scale-110"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <p className="text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">
+                      {formatDateForDisplay(item.date)}
+                    </p>
+                    <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{item.title}</h3>
+                    <p className="text-gray-400 mb-4 font-['Montserrat',sans-serif]">{item.summary}</p>
+                    <Link
+                      href={`/noticias/${item.id}`}
+                      className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif]"
+                    >
+                      Ler mais{" "}
+                      <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
+                        →
+                      </span>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </section>
 
@@ -891,7 +843,7 @@ export default function LandingPage() {
             className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto"
             variants={staggerContainer}
             initial="hidden"
-            animate={discographyVisible ? "visible" : "hidden"}
+            animate="visible"
           >
             {/* Com o porto da memória (2017) */}
             <motion.div
@@ -1078,47 +1030,56 @@ export default function LandingPage() {
             </a>
           </motion.div>
 
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-            initial={{ opacity: 0 }}
-            animate={performancesVisible ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {performances.map((performance) => (
-              <div
-                key={performance.id}
-                className="bg-gray-900 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
-              >
-                {performance.image && (
-                  <div className="overflow-hidden">
-                    <img
-                      src={performance.image || "/placeholder.svg"}
-                      alt={performance.title}
-                      className="w-full h-48 object-cover transition-transform duration-700 hover:scale-110"
-                    />
-                  </div>
-                )}
-                <div className="p-6">
-                  <div className="flex items-center text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">
-                    <FaCalendarAlt className="mr-2" />
-                    <span>{performance.date}</span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{performance.title}</h3>
-                  <p className="text-gray-400 mb-2 font-['Montserrat',sans-serif]">{performance.location}</p>
-                  <p className="text-gray-500 mb-4 font-['Montserrat',sans-serif]">{performance.summary}</p>
-                  <Link
-                    href={`/atuacoes/${performance.id}`}
-                    className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif]"
-                  >
-                    Ver detalhes{" "}
-                    <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
-                      →
-                    </span>
-                  </Link>
-                </div>
+          {isLoadingPerformances ? (
+            <div className="text-center py-20">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-red-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                <span className="sr-only">Carregando...</span>
               </div>
-            ))}
-          </motion.div>
+              <p className="mt-4 text-gray-400">Carregando atuações...</p>
+            </div>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-3 gap-8"
+              initial={{ opacity: 0 }}
+              animate={performancesVisible ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {performances.map((performance) => (
+                <div
+                  key={performance.id}
+                  className="bg-gray-900 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
+                >
+                  {performance.image && (
+                    <div className="overflow-hidden">
+                      <img
+                        src={performance.image || "/placeholder.svg"}
+                        alt={performance.title}
+                        className="w-full h-48 object-cover transition-transform duration-700 hover:scale-110"
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <div className="flex items-center text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">
+                      <FaCalendarAlt className="mr-2" />
+                      <span>{formatDateForDisplay(performance.date)}</span>
+                    </div>
+                    <h3 className="text-xl font-bold mb-2 font-['Playfair_Display',serif]">{performance.title}</h3>
+                    <p className="text-gray-400 mb-2 font-['Montserrat',sans-serif]">{performance.location}</p>
+                    <p className="text-gray-500 mb-4 font-['Montserrat',sans-serif]">{performance.summary}</p>
+                    <Link
+                      href={`/atuacoes/${performance.id}`}
+                      className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif]"
+                    >
+                      Ver detalhes{" "}
+                      <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
+                        →
+                      </span>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </section>
 

@@ -3,71 +3,8 @@
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { FaCalendarAlt } from "react-icons/fa"
-import { useState } from "react"
-
-// News data
-const newsItems = [
-  {
-    id: 1,
-    title: "TEUP vence Festival Internacional de Tunas",
-    date: "15 de Março, 2025",
-    summary:
-      "A Tuna de Engenharia da Universidade do Porto conquistou o primeiro lugar no prestigiado Festival Internacional de Tunas em Coimbra.",
-    image: "/images/teup-flag-performance.png",
-    content:
-      "A Tuna de Engenharia da Universidade do Porto (TEUP) conquistou o primeiro lugar no prestigiado Festival Internacional de Tunas em Coimbra. Após uma atuação memorável que incluiu clássicos do repertório tunante e algumas inovações musicais, o júri decidiu por unanimidade atribuir o prémio principal à nossa tuna.",
-    tags: ["Festival", "Competição", "Prémios", "Internacional"],
-  },
-  {
-    id: 2,
-    title: "Novo CD 'Tradição Engenheira' já disponível",
-    date: "28 de Fevereiro, 2025",
-    summary:
-      "O mais recente trabalho da TEUP já está disponível em todas as plataformas digitais e na nossa loja online.",
-    image: "/images/teup-musicians.png",
-    content:
-      "É com grande orgulho que anunciamos o lançamento do nosso novo álbum 'Tradição Engenheira'. Este trabalho representa dois anos de dedicação e paixão pela música tradicional portuguesa, reinterpretada com o estilo único da TEUP.",
-    tags: ["Música", "Lançamento", "CD", "Streaming"],
-  },
-  {
-    id: 3,
-    title: "Inscrições abertas para novos tunos",
-    date: "10 de Janeiro, 2025",
-    summary:
-      "Estão abertas as inscrições para estudantes de Engenharia que queiram juntar-se à TEUP. As audições decorrerão durante o mês de Fevereiro.",
-    image: "/images/teup-university.png",
-    content:
-      "A Tuna de Engenharia da Universidade do Porto (TEUP) anuncia a abertura de inscrições para novos membros. Convidamos todos os estudantes da Faculdade de Engenharia que tenham interesse em música e nas tradições académicas a candidatarem-se.",
-    tags: ["Recrutamento", "Audições", "Novos Membros"],
-  },
-  {
-    id: 4,
-    title: "Workshop de técnicas vocais para tunos",
-    date: "5 de Dezembro, 2024",
-    summary: "A TEUP organizará um workshop de técnicas vocais, aberto a todos os tunos e interessados em canto tradicional.",
-    image: "/images/teup-meeting-room.png",
-    content: "Com o objetivo de aprimorar as habilidades vocais dos nossos membros, a TEUP organizará um workshop intensivo de técnicas vocais específicas para o canto tunante.",
-    tags: ["Workshop", "Técnica Vocal", "Formação"],
-  },
-  {
-    id: 5,
-    title: "TEUP participa em festival solidário",
-    date: "20 de Novembro, 2024",
-    summary: "A nossa tuna vai participar num festival solidário para arrecadar fundos para o hospital pediátrico local.",
-    image: "/images/teup-outdoor.png",
-    content: "A TEUP junta-se a várias outras tunas e grupos musicais para um festival beneficente que visa arrecadar fundos para a compra de equipamentos para o hospital pediátrico local.",
-    tags: ["Solidariedade", "Festival", "Comunidade"],
-  },
-  {
-    id: 6,
-    title: "Aniversário da TEUP: 35 anos de tradição",
-    date: "15 de Outubro, 2024",
-    summary: "A Tuna de Engenharia da Universidade do Porto celebra 35 anos de história com um concerto especial.",
-    image: "/images/teup-performance.png",
-    content: "Este mês marca o 35º aniversário da fundação da nossa tuna, e para comemorar esta data especial, organizaremos um concerto com a participação de atuais membros e antigos tunos.",
-    tags: ["Aniversário", "História", "Celebração"],
-  },
-]
+import { useState, useEffect } from "react"
+import { NewsItem, fetchPublishedNews, formatDateForDisplay } from "@/lib/news-service"
 
 // Animation variants
 const staggerContainer = {
@@ -120,7 +57,30 @@ const fadeIn = {
 
 export default function AllNews() {
   const [activeFilter, setActiveFilter] = useState<string>("all")
-  const uniqueTags = Array.from(new Set(newsItems.flatMap(item => item.tags || [])))
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  
+  // Get all unique tags from news
+  const uniqueTags = Array.from(
+    new Set(newsItems.flatMap(item => item.tags || []))
+  )
+
+  // Load news data
+  useEffect(() => {
+    const loadNews = async () => {
+      setIsLoading(true);
+      try {
+        const { news } = await fetchPublishedNews();
+        setNewsItems(news);
+      } catch (error) {
+        console.error("Error loading news:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadNews();
+  }, []);
 
   // Filter news items based on selected tag
   const filteredNews = activeFilter === "all" 
@@ -176,64 +136,73 @@ export default function AllNews() {
       {/* News Listing */}
       <section className="py-12 bg-gray-900">
         <div className="container mx-auto px-4">
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-          >
-            {filteredNews.map((item) => (
-              <motion.div
-                key={item.id}
-                className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
-                variants={staggerItem}
-              >
-                {item.image && (
-                  <div className="overflow-hidden h-48">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-                    />
-                  </div>
-                )}
-                <div className="p-6">
-                  <div className="flex items-center text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">
-                    <FaCalendarAlt className="mr-2" />
-                    <span>{item.date}</span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 font-['Playfair_Display',serif]">{item.title}</h3>
-                  <p className="text-gray-400 mb-4 font-['Montserrat',sans-serif] line-clamp-3">{item.summary}</p>
-                  
-                  {/* Tags */}
-                  {item.tags && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {item.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gray-700 text-xs rounded-full text-gray-300 font-['Montserrat',sans-serif]"
-                        >
-                          {tag}
-                        </span>
-                      ))}
+          {isLoading ? (
+            <div className="text-center py-20">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-red-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                <span className="sr-only">Carregando...</span>
+              </div>
+              <p className="mt-4 text-gray-400">Carregando notícias...</p>
+            </div>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {filteredNews.map((item) => (
+                <motion.div
+                  key={item.id}
+                  className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
+                  variants={staggerItem}
+                >
+                  {item.image && (
+                    <div className="overflow-hidden h-48">
+                      <img
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                      />
                     </div>
                   )}
-                  
-                  <Link
-                    href={`/noticias/${item.id}`}
-                    className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif]"
-                  >
-                    Ler mais{" "}
-                    <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
-                      →
-                    </span>
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                  <div className="p-6">
+                    <div className="flex items-center text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">
+                      <FaCalendarAlt className="mr-2" />
+                      <span>{formatDateForDisplay(item.date)}</span>
+                    </div>
+                    <h3 className="text-xl font-bold mb-3 font-['Playfair_Display',serif]">{item.title}</h3>
+                    <p className="text-gray-400 mb-4 font-['Montserrat',sans-serif] line-clamp-3">{item.summary}</p>
+                    
+                    {/* Tags */}
+                    {item.tags && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {item.tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-gray-700 text-xs rounded-full text-gray-300 font-['Montserrat',sans-serif]"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <Link
+                      href={`/noticias/${item.id}`}
+                      className="text-red-500 hover:text-red-400 transition-all duration-300 flex items-center group font-['Montserrat',sans-serif]"
+                    >
+                      Ler mais{" "}
+                      <span className="ml-1 transform transition-transform duration-300 group-hover:translate-x-1">
+                        →
+                      </span>
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
           
-          {filteredNews.length === 0 && (
+          {!isLoading && filteredNews.length === 0 && (
             <div className="text-center py-16">
               <h3 className="text-xl font-bold mb-2 font-['Montserrat',sans-serif]">Nenhuma notícia encontrada</h3>
               <p className="text-gray-400 font-['Montserrat',sans-serif]">

@@ -3,7 +3,9 @@
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
 import { FaArrowLeft, FaCalendarAlt, FaShareAlt, FaFacebook, FaTwitter, FaWhatsapp } from "react-icons/fa"
+import { NewsItem, fetchNewsById, fetchPublishedNews, formatDateForDisplay } from "@/lib/news-service"
 
 // Animation variants for smoother transitions
 const fadeIn = {
@@ -61,46 +63,6 @@ const staggerItem = {
   }
 }
 
-// News data
-const newsItems = [
-  {
-    id: 1,
-    title: "TEUP vence Festival Internacional de Tunas",
-    date: "15 de Março, 2025",
-    summary:
-      "A Tuna de Engenharia da Universidade do Porto conquistou o primeiro lugar no prestigiado Festival Internacional de Tunas em Coimbra.",
-    image: "/images/teup-flag-performance.png",
-    content:
-      "A Tuna de Engenharia da Universidade do Porto (TEUP) conquistou o primeiro lugar no prestigiado Festival Internacional de Tunas em Coimbra. Após uma atuação memorável que incluiu clássicos do repertório tunante e algumas inovações musicais, o júri decidiu por unanimidade atribuir o prémio principal à nossa tuna.\n\nEste reconhecimento vem coroar meses de ensaios intensivos e dedicação de todos os membros. A competição contou com a participação de 12 tunas de diferentes países, incluindo Espanha, Brasil e Itália.\n\nAlém do prémio principal, a TEUP também arrecadou o prémio de 'Melhor Instrumental' e 'Melhor Solista' para o nosso bandolinista António Ferreira.\n\nA vitória neste festival abre portas para futuras participações em eventos internacionais e consolida a posição da TEUP como uma das melhores tunas académicas de Portugal.",
-    author: "Comissão de Comunicação TEUP",
-    tags: ["Festival", "Competição", "Prémios", "Internacional"],
-  },
-  {
-    id: 2,
-    title: "Novo CD 'Tradição Engenheira' já disponível",
-    date: "28 de Fevereiro, 2025",
-    summary:
-      "O mais recente trabalho da TEUP já está disponível em todas as plataformas digitais e na nossa loja online.",
-    image: "/images/teup-musicians.png",
-    content:
-      "É com grande orgulho que anunciamos o lançamento do nosso novo álbum 'Tradição Engenheira'. Este trabalho representa dois anos de dedicação e paixão pela música tradicional portuguesa, reinterpretada com o estilo único da TEUP.\n\nO álbum contém 12 faixas, incluindo clássicos do repertório tunante e três composições originais dos nossos membros. As gravações foram realizadas nos estúdios da Faculdade de Engenharia, com produção de João Silva, nosso atual Ensaiador.\n\n'Tradição Engenheira' já está disponível em todas as plataformas digitais como Spotify, Apple Music e YouTube Music. Também é possível adquirir a versão física do CD através da nossa loja online ou nos nossos concertos.\n\nParte das receitas das vendas será destinada ao fundo de bolsas para estudantes de Engenharia da UP. Agradecemos a todos que tornaram este projeto possível e esperamos que apreciem o resultado do nosso trabalho.",
-    author: "Comissão de Comunicação TEUP",
-    tags: ["Música", "Lançamento", "CD", "Streaming"],
-  },
-  {
-    id: 3,
-    title: "Inscrições abertas para novos tunos",
-    date: "10 de Janeiro, 2025",
-    summary:
-      "Estão abertas as inscrições para estudantes de Engenharia que queiram juntar-se à TEUP. As audições decorrerão durante o mês de Fevereiro.",
-    image: "/images/teup-university.png",
-    content:
-      "A Tuna de Engenharia da Universidade do Porto (TEUP) anuncia a abertura de inscrições para novos membros. Convidamos todos os estudantes da Faculdade de Engenharia que tenham interesse em música e nas tradições académicas a candidatarem-se.\n\nProcuramos principalmente instrumentistas de cordas (violão, bandolim, viola, cavaquinho), mas também estamos abertos a outros instrumentos e vozes. Não é necessário ter experiência prévia ou formação musical formal - o mais importante é a vontade de aprender e o compromisso com o grupo.\n\nAs inscrições podem ser feitas através do formulário disponível no nosso site até 31 de Janeiro. As audições decorrerão durante o mês de Fevereiro, e os resultados serão anunciados até 15 de Março.\n\nOs selecionados passarão por um período de integração de seis meses antes de se tornarem membros efetivos. Junte-se a nós e faça parte desta tradição que já dura mais de três décadas!",
-    author: "Comissão de Recrutamento TEUP",
-    tags: ["Recrutamento", "Audições", "Novos Membros"],
-  },
-]
-
 // NewsNotFound component
 function NewsNotFound() {
   return (
@@ -121,16 +83,51 @@ export default function NewsDetail() {
   // Convert id to number
   const id = Number(params.id);
   
-  // Find the matching news item
-  const newsItem = newsItems.find((item) => item.id === id)
+  const [newsItem, setNewsItem] = useState<NewsItem | null>(null);
+  const [relatedNews, setRelatedNews] = useState<NewsItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Fetch the news item and related news
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch the current news item
+        const currentNews = await fetchNewsById(id);
+        setNewsItem(currentNews);
+        
+        // Fetch other news for the related section
+        const { news } = await fetchPublishedNews();
+        const otherNews = news.filter(item => item.id !== id);
+        setRelatedNews(otherNews);
+      } catch (error) {
+        console.error("Error loading news:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadData();
+  }, [id]);
+  
+  // If loading, show a loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-red-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+            <span className="sr-only">Carregando...</span>
+          </div>
+          <p className="mt-4 text-gray-400">Carregando notícia...</p>
+        </div>
+      </div>
+    );
+  }
   
   // If news item not found, show the not found component
   if (!newsItem) {
     return <NewsNotFound />
   }
-
-  // Get other news items (excluding the current one) to display as related news
-  const otherNewsItems = newsItems.filter(item => item.id !== id);
 
   // Format content with paragraphs
   const formattedContent = newsItem.content.split("\n\n").map((paragraph, index) => (
@@ -172,7 +169,7 @@ export default function NewsDetail() {
             <h1 className="text-3xl md:text-5xl font-bold mb-4 font-['Cinzel',serif]">{newsItem.title}</h1>
             <div className="flex items-center text-gray-400 mb-8 font-['Montserrat',sans-serif]">
               <FaCalendarAlt className="mr-2" />
-              <span>{newsItem.date}</span>
+              <span>{formatDateForDisplay(newsItem.date)}</span>
               {newsItem.author && (
                 <>
                   <span className="mx-2">•</span>
@@ -274,7 +271,7 @@ export default function NewsDetail() {
             variants={staggerContainer}
             className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
-            {otherNewsItems.slice(0, 3).map((item) => (
+            {relatedNews.slice(0, 3).map((item) => (
               <motion.div
                 key={item.id}
                 className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:shadow-red-500/10 transform hover:scale-[1.02]"
@@ -292,7 +289,7 @@ export default function NewsDetail() {
                 <div className="p-6">
                   <div className="flex items-center text-red-500 text-sm mb-2 font-['Montserrat',sans-serif]">
                     <FaCalendarAlt className="mr-2" />
-                    <span>{item.date}</span>
+                    <span>{formatDateForDisplay(item.date)}</span>
                   </div>
                   <h3 className="text-xl font-bold mb-3 font-['Playfair_Display',serif]">{item.title}</h3>
                   <p className="text-gray-400 mb-4 font-['Montserrat',sans-serif] line-clamp-3">{item.summary}</p>
@@ -324,7 +321,7 @@ export default function NewsDetail() {
               </motion.div>
             ))}
             
-            {otherNewsItems.length === 0 && (
+            {relatedNews.length === 0 && (
               <div className="bg-gray-900 rounded-lg p-6 col-span-3 text-center">
                 <p className="text-gray-400 font-['Montserrat',sans-serif]">
                   Não há outras notícias disponíveis no momento.
