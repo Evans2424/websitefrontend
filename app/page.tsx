@@ -7,7 +7,7 @@ import ImageCarousel from "./components/ImageCarousel"
 import { motion, AnimatePresence } from "framer-motion"
 import ScrollToTop from "./components/ScrollToTop"
 import FlippableCard from "./components/FlippableCard"
-import { Member, fetchHomepageMembers } from "@/lib/members-service"
+import { Member, fetchHomepageMembers, getGodfatherInfo } from "@/lib/members-service"
 
 // News/Events data
 interface NewsItem {
@@ -118,6 +118,13 @@ const fadeInUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
 }
 
+// Fade in/out effect for sections
+const sectionFadeEffect = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 1.2, ease: "easeOut" } },
+  scrollOut: { opacity: 0, transition: { duration: 1.2, ease: "easeIn" } }
+}
+
 // Smoother staggering animations for sections like News and Performances
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -184,6 +191,7 @@ export default function LandingPage() {
   const [isLoadingMembers, setIsLoadingMembers] = useState(true);
   const [activeTab, setActiveTab] = useState<"current" | "former">("current");
   const [activeGalleryFilter, setActiveGalleryFilter] = useState("all");
+  const [godfatherInfo, setGodfatherInfo] = useState<Record<number, Member>>({});
 
   // Function to get priority and random members for display
   const getMembersToDisplay = (members: Member[]) => {
@@ -321,6 +329,31 @@ export default function LandingPage() {
         const { activeMembers, formerMembers } = await fetchHomepageMembers();
         setActiveMembers(activeMembers);
         setFormerMembers(formerMembers);
+        
+        // Load godfather information for all members
+        const godfatherMap: Record<number, Member> = {};
+        
+        // Process active members
+        for (const member of activeMembers) {
+          if (member.godfather) {
+            const godfather = getGodfatherInfo(member.godfather);
+            if (godfather) {
+              godfatherMap[member.id] = godfather;
+            }
+          }
+        }
+        
+        // Process former members
+        for (const member of formerMembers) {
+          if (member.godfather) {
+            const godfather = getGodfatherInfo(member.godfather);
+            if (godfather) {
+              godfatherMap[member.id] = godfather;
+            }
+          }
+        }
+        
+        setGodfatherInfo(godfatherMap);
       } catch (error) {
         console.error("Error loading members:", error);
       } finally {
@@ -330,6 +363,21 @@ export default function LandingPage() {
 
     loadMembers();
   }, []);
+  
+  // Function to handle godfather link clicks
+  const handleGodfatherClick = (godfather: Member) => {
+    // Create the search parameters for the godfather's name
+    const searchName = godfather.nickname || godfather.name;
+    
+    // Set the display type based on whether the godfather is active or former
+    const displayType = godfather.isActive ? 'active' : 'former';
+    
+    // Create the redirect URL with the appropriate parameters
+    const redirectURL = `/membros?search=${encodeURIComponent(searchName)}&display=${displayType}`;
+    
+    // Redirect to the members page
+    window.location.href = redirectURL;
+  };
 
   return (
     <div className="min-h-screen bg-black text-white font-['Playfair_Display',serif] overflow-x-hidden w-full">
@@ -590,7 +638,15 @@ export default function LandingPage() {
       </section>
 
       {/* Members Section */}
-      <section id="members" className="py-20 bg-gradient-to-b from-gray-900 to-black" ref={membersRef}>
+      <motion.section 
+        id="members" 
+        className="py-20 bg-gradient-to-b from-gray-900 to-black" 
+        ref={membersRef}
+        variants={sectionFadeEffect}
+        initial="hidden"
+        animate={membersVisible ? "visible" : "hidden"}
+        exit="scrollOut"
+      >
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-12"
@@ -671,7 +727,7 @@ export default function LandingPage() {
                 {(activeTab === "current" ? activeMembers : formerMembers).map((member, index) => (
                   <motion.div 
                     key={member.id} 
-                    className="h-[420px]"
+                    className="h-[440px]" // Increased from 420px to 440px
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ 
@@ -763,26 +819,25 @@ export default function LandingPage() {
                           </div>
 
                           {/* Godfather information - compact version */}
-                          {member.godfather && (
+                          {member.godfather && godfatherInfo[member.id] && (
                             <div className="mb-3">
                               <Link 
-                                href={
-                                  /* Check if we need to link to former members page based on godfather ID */
-                                  member.godfather > 100 
-                                    ? `/membros?search=${encodeURIComponent(member.godfather.toString())}&display=former` 
-                                    : `/membros?search=${encodeURIComponent(member.godfather.toString())}`
-                                }
+                                href={`/membros?search=${encodeURIComponent(godfatherInfo[member.id].nickname || godfatherInfo[member.id].name)}&display=${godfatherInfo[member.id].hierarchy === 'Tuno' || godfatherInfo[member.id].hierarchy === 'Mestre-Tuno' ? 'active' : 'former'}`}
                                 className="godfather-link flex items-center gap-2 bg-gray-800 p-2 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleGodfatherClick(godfatherInfo[member.id]);
+                                }}
                               >
                                 <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
                                   <img 
-                                    src="/placeholder.svg" 
+                                    src={godfatherInfo[member.id].image || "/placeholder.svg"} 
                                     alt="Padrinho"
                                     className="w-full h-full object-cover"
                                   />
                                 </div>
                                 <div className="flex-1 overflow-hidden">
-                                  <p className="text-sm font-medium truncate text-gray-200">Padrinho</p>
+                                  <p className="text-sm font-medium truncate text-gray-200">{godfatherInfo[member.id].nickname || godfatherInfo[member.id].name}</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -803,7 +858,7 @@ export default function LandingPage() {
             </AnimatePresence>
           )}
         </div>
-      </section>
+      </motion.section>
 
       {/* Discography Section */}
       <section id="discography" className="py-20 bg-black" ref={discographyRef}>

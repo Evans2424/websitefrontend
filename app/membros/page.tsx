@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -45,46 +45,83 @@ export default function MembersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [godfatherInfo, setGodfatherInfo] = useState<{[key: number]: Member | undefined}>({});
   
-  // Handle URL search parameters
+  // Keep track of initialization state
+  const initializedRef = useRef(false);
+  
+  // Initialize state from URL parameters and load appropriate data once on mount
   useEffect(() => {
-    const urlSearchParam = searchParams.get('search');
-    if (urlSearchParam) {
+    const initializeFromUrl = async () => {
+      // Don't run the initialization more than once
+      if (initializedRef.current) return;
+      
+      // Get parameters from URL
+      const urlDisplayParam = searchParams.get('display') || 'active';
+      const urlSearchParam = searchParams.get('search') || '';
+      
+      // Set initial state based on URL parameters
+      const initialDisplayType = urlDisplayParam === 'former' ? 'former' : 'active';
+      setDisplayType(initialDisplayType);
       setSearchQuery(urlSearchParam);
-    }
+      
+      // Load the appropriate members based on the display type from URL
+      await loadMembers(initialDisplayType);
+      
+      // Mark as initialized
+      initializedRef.current = true;
+    };
+    
+    initializeFromUrl();
   }, [searchParams]);
 
-  // Load all members
-  useEffect(() => {
-    const loadMembers = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch appropriate members based on display type
-        const response = displayType === "active" 
-          ? await fetchActiveMembers()
-          : await fetchFormerMembers();
-          
-        setMembers(response.members);
+  // Function to load members - extracted as a reusable function
+  const loadMembers = async (type: "active" | "former" = displayType) => {
+    setIsLoading(true);
+    try {
+      // Fetch appropriate members based on display type
+      const response = type === "active" 
+        ? await fetchActiveMembers()
+        : await fetchFormerMembers();
         
-        // Load godfather information for all members
-        const godfatherIds = response.members
-          .filter(m => m.godfather)
-          .map(m => m.godfather as number);
-          
-        const uniqueGodfatherIds = [...new Set(godfatherIds)];
-        const godfathersMap: {[key: number]: Member | undefined} = {};
+      setMembers(response.members);
+      
+      // Load godfather information for all members
+      const godfatherIds = response.members
+        .filter(m => m.godfather)
+        .map(m => m.godfather as number);
         
-        for (const id of uniqueGodfatherIds) {
-          godfathersMap[id] = getGodfatherInfo(id);
-        }
-        
-        setGodfatherInfo(godfathersMap);
-        
-      } catch (error) {
-        console.error("Error loading members:", error);
-      } finally {
-        setIsLoading(false);
+      const uniqueGodfatherIds = [...new Set(godfatherIds)];
+      const godfathersMap: {[key: number]: Member | undefined} = {};
+      
+      for (const id of uniqueGodfatherIds) {
+        godfathersMap[id] = getGodfatherInfo(id);
       }
-    };
+      
+      setGodfatherInfo(godfathersMap);
+      
+    } catch (error) {
+      console.error("Error loading members:", error);
+    } finally {
+      setIsLoading(false);
+    }
+    
+    return true;
+  };
+  
+  // Handle display type changes from UI (not URL)
+  const handleDisplayTypeChange = async (type: "active" | "former") => {
+    // Update URL query parameters
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('display', type);
+    
+    // Update local state and URL, but don't load members yet (that happens in the effect)
+    setDisplayType(type);
+    router.push(`/membros?${newParams.toString()}`, { scroll: false });
+  };
+  
+  // Re-load members whenever display type changes from UI interaction
+  useEffect(() => {
+    // Skip the first render which is handled by the initialization effect
+    if (!initializedRef.current) return;
     
     loadMembers();
   }, [displayType]);
@@ -98,31 +135,20 @@ export default function MembersPage() {
       const searchName = godfather.nickname || godfather.name;
       
       // Check if the godfather is a former member and update display type accordingly
-      if (!godfather.isActive && displayType !== "former") {
-        setDisplayType("former");
-        
-        // We need to wait for the members to load before we can search
-        setTimeout(() => {
-          setSearchQuery(searchName);
-          // Update URL with search param and display type
-          const newParams = new URLSearchParams();
-          newParams.set('search', searchName);
-          newParams.set('display', 'former');
-          const newPathname = `/membros?${newParams.toString()}`;
-          router.push(newPathname, { scroll: false });
-        }, 500);
-      } else {
-        // Just update search if we're already on the correct display type
-        setSearchQuery(searchName);
-        // Update URL with search param and keep display type
-        const newParams = new URLSearchParams();
-        newParams.set('search', searchName);
-        if (displayType === "former") {
-          newParams.set('display', 'former');
-        }
-        const newPathname = `/membros?${newParams.toString()}`;
-        router.push(newPathname, { scroll: false });
+      const newDisplayType = godfather.isActive ? "active" : "former";
+      
+      // Update URL with search param and display type
+      const newParams = new URLSearchParams();
+      newParams.set('search', searchName);
+      newParams.set('display', newDisplayType);
+      
+      // Navigate to the new URL - this will trigger our initialization effect if display type changes
+      if (newDisplayType !== displayType) {
+        setDisplayType(newDisplayType);
       }
+      
+      setSearchQuery(searchName);
+      router.push(`/membros?${newParams.toString()}`, { scroll: false });
     }
   };
   
@@ -217,7 +243,7 @@ export default function MembersPage() {
                 </label>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => setDisplayType("active")}
+                    onClick={() => handleDisplayTypeChange("active")}
                     className={`px-4 py-2 rounded-full transition-all duration-300 text-sm flex-grow font-['Montserrat',sans-serif] ${
                       displayType === "active"
                         ? "bg-red-700 text-white"
@@ -227,7 +253,7 @@ export default function MembersPage() {
                     Atuais
                   </button>
                   <button
-                    onClick={() => setDisplayType("former")}
+                    onClick={() => handleDisplayTypeChange("former")}
                     className={`px-4 py-2 rounded-full transition-all duration-300 text-sm flex-grow font-['Montserrat',sans-serif] ${
                       displayType === "former"
                         ? "bg-red-700 text-white"
@@ -557,6 +583,11 @@ export default function MembersPage() {
                   setRoleFilter("all");
                   setHierarchyFilter("all");
                   setSearchQuery("");
+                  
+                  // Clear search params from URL but maintain display type
+                  const newParams = new URLSearchParams();
+                  newParams.set('display', displayType); 
+                  router.push(`/membros?${newParams.toString()}`, { scroll: false });
                 }}
                 className="mt-4 px-4 py-2 bg-red-700 hover:bg-red-800 rounded-full text-sm font-medium transition-all duration-300 font-['Montserrat',sans-serif]"
               >
